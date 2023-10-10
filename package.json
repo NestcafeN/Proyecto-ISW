@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Proyecto de Ingenieria de Software acerca de una aplicacion web para los tramites municipales de Proyectos, postulación a fondos, concursos",
   "main": "server.js",
+  "type":"module",
   "scripts": {
     "start": "nodemon src/server.js"
   },

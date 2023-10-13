@@ -1,77 +1,106 @@
-import { Concurso } from '../models/concurso.model.js';
+"use strict";
+
+import concursoService from "../services/concurso.service.js";
+import handleError from "../utils/errorHandler.js";
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { concursoSchema } from "../schemas/concurso.schema.js";
 
 export async function getConcursos(req, res) {
       try {
-            const concursos = await Concurso.find();
-            res.status(200).json({ concursos });
+            const [concursos, errorConcursos] = await concursoService.getConcursos();
+            if (errorConcursos) {
+                  return respondError(req, res, 404, errorConcursos);
+            }
+            concursos.length === 0
+                  ? respondSuccess(req, res, 204)
+                  : respondSuccess(req, res, 200, concursos);
       } catch (error) {
-            res.status(500).json({ message: "Error al obtener los Concursos Creados" });
+            handleError(error, "concurso.controller -> getConcursos");
+            respondError(req, res, 400, error.message);
       }
 }
 
-export async function getConcurso(req, res) {
+export async function getConcursoById(req, res) {
       try {
-            const concurso = await Concurso.findById(req.params.id);
-            if (!concurso) {
-                  return res.status(404).json({ message: "Concurso no encontrado"});
+            const { params } = req;
+            const { error: paramsError } = concursoSchema.validate(params);
+            if (paramsError) {
+                  return respondError(req, res, 400, paramsError.message);
             }
-            res.status(200).json({ concurso });
-      } catch (error) { 
-            res.status(500).json({ message: "Error al obtener el Concurso" });
+
+            const [concurso, errorConcurso] = await concursoService.getConcursoById(params.id);
+            if (errorConcurso) {
+                  return respondError(req, res, 404, errorConcurso);
+            }
+            respondSuccess(req, res, 200, concurso);
+      } catch (error) {
+            handleError(error, "concurso.controller -> getConcursoById");
+            respondError(req, res, 500, "No se pudo obtener el concurso");
       }
 }
 
 export async function createConcurso(req, res) {
       try {
-            const concurso = new Concurso({
-                  nombre: req.body.nombre,
-                  descripcion: req.body.descripcion,
-                  tipo: req.body.tipo,
-                  estado: req.body.estado,
-                  postulaciones: req.body.postulaciones,
-                  fechaAperturaConcurso: req.body.fechaAperturaConcurso,
-                  fechaCierreConcurso: req.body.fechaCierreConcurso,
-                  fechaAnuncioGanador: req.body.fechaAnuncioGanador,
-            });
-            const nuevoConcurso = await concurso.save();
-            res.status(201).json(nuevoConcurso);
+            const {body} = req;
+            const {error: bodyError } = concursoSchema.validate(body);
+            if (bodyError) {
+                  return respondError(req, res, 400, bodyError.message);
+            }
+            const [newConcurso, errorConcurso] = await concursoService.createConcurso(body);
+            if (errorConcurso) {
+                  return respondError(req, res, 400, errorConcurso);
+            }
+            if (!newConcurso) {
+                  return respondError(req, res, 400, "No se pudo crear el concurso");
+            }
+            respondSuccess(req, res, 201, newConcurso);
       } catch (error) {
-            res.status(400).json({ message: "Error al crear Concurso" });
+            handleError(error, "concurso.controller -> createConcurso");
+            respondError(req, res, 500, "No se pudo crear el concurso");
       }
 }
 
 export async function updateConcurso(req, res) {
-      try {
-            const concurso = await Concurso.findById(req.params.id);
-                  if (!concurso) {
-                        return res.status(404).json({ message: "Concurso no encontrado"});
-                  }
-            concursos.nombre = req.body.nombre;
-            concursos.descripcion = req.body.descripcion;
-            concursos.tipo = req.body.tipo;
-            concursos.estado = req.body.estado;
-            concursos.postulaciones = req.body.postulaciones;
-            concursos.fechaAperturaConcurso = req.body.fechaAperturaConcurso;
-            concursos.fechaCierreConcurso = req.body.fechaCierreConcurso;
-            concursos.fechaAnuncioGanador = req.body.fechaAnuncioGanador;
+      try{
+            const {body, params} = req;
+            const {error: bodyError} = concursoSchema.validate(body);
+            const {error: paramsError} = concursoSchema.validate(params);
+            if (bodyError || paramsError) {
+                  return respondError(req, res, 400, bodyError.message || paramsError.message);
+            }
+            const [updatedConcurso, errorConcurso] = await concursoService.updateConcurso(params.id, body);
+            if (errorConcurso) {
+                  return respondError(req, res, 400, errorConcurso);
+            }
+            if (!updatedConcurso) {
+                  return respondError(req, res, 400, "No se pudo actualizar el concurso");
+            }
+            respondSuccess(req, res, 200, updatedConcurso);
 
-                  const concursoActualizado = await concurso.save();
-                        res.status(200).json(concursoActualizado);
       } catch (error) {
-            res.status(400).json({message: "Error al actualizar Concurso"})
+            handleError(error, "concurso.controller -> updateConcurso");
+            respondError(req, res, 500, "No se pudo actualizar el concurso");
       }
 }
 
 export async function deleteConcurso(req, res) {
       try {
-            const concurso = await Concurso.findById(req.params.id);
-
-            if (!concurso) {
-                  return res.status(404).json({ message: "Concurso no encontrado"});
+            const {params} = req;
+            const {error: paramsError} = concursoSchema.validate(params);
+            if (paramsError) {
+                  return respondError(req, res, 400, paramsError.message);
             }
-            await concurso.remove();
-            res.status(200).json({ message: "Concurso eliminado correctamente"});
+            const [deleteConcurso, errorConcurso] = await concursoService.deleteConcurso(params.id);
+            if (errorFondo) {
+                  return respondError(req, res, 400, errorConcurso);
+            }
+            if (!deleteConcurso){
+                  return respondError(req, res, 400, "No se pudo eliminar el concurso");
+            }
+            respondSuccess(req, res, 200, deleteConcurso);
+
       } catch (error) {
-            res.status(400).json({message: "Error al eliminar Concurso"})
+            handleError(error, "concurso.controller -> deleteConcurso");
+            respondError(req, res, 500, "No se pudo eliminar el concurso");
       }
 }

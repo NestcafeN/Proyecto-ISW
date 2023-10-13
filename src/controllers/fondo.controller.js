@@ -1,75 +1,104 @@
-import { Fondo } from '../models/fondo.model.js';
+"use strict";
+
+import fondoService from "../services/fondo.service.js";
+import handleError from "../utils/errorHandler.js";
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { fondoSchema } from "../schemas/fondo.schema.js";
 
 export async function getFondos(req, res) {
       try {
-            const fondos = await Fondo.find();
-            res.status(200).json({ fondos });
+            const [fondos, errorFondos] = await fondoService.getFondos();
+            if (errorFondos) {
+                  return respondError(req, res, 404, errorFondos);
+            }
+            fondos.length === 0
+                  ? respondSuccess(req, res, 204)
+                  : respondSuccess(req, res, 200, fondos);
       } catch (error) {
-            res.status(500).json({ message: "Error al obtener los Fondos" });
+            handleError(error, "fondo.controller -> getFondos");
+            respondError(req, res, 400, error.message);
       }
 }
 
-export async function getFondo(req, res) {
+export async function getFondoById(req, res) {
       try {
-            const fondo = await Fondo.findById(req.params.id);
-            if (!fondo) {
-                  return res.status(404).json({ message: "Fondo no encontrado"});
+            const { params } = req;
+            const { error: paramsError } = fondoSchema.validate(params);
+            if (paramsError) {
+                  return respondError(req, res, 400, paramsError.message);
             }
-            res.status(200).json({ fondo });
+
+            const [fondo, errorFondo] = await fondoService.getFondoById(params.id);
+            if (errorFondo) {
+                  return respondError(req, res, 404, errorFondo);
+            }
+            respondSuccess(req, res, 200, fondo);
       } catch (error) {
-            res.status(500).json({ message: "Error al obtener el Fondo" });
+            handleError(error, "fondo.controller -> getFondoById");
+            respondError(req, res, 500, "No se pudo obtener el fondo");
       }
 }
 
 export async function createFondo(req, res) {
       try {
-            const fondo = new Fondo({
-                  nombre: req.body.nombre,
-                  descripcion: req.body.descripcion,
-                  tipo: req.body.tipo,
-                  monto: req.body.monto,
-                  fechaApertura: req.body.fechaApertura,
-                  fechaCierre: req.body.fechaCierre,
-            });
-            const nuevoFondo = await fondo.save();
-            res.status(201).json(nuevoFondo);
+            const {body} = req;
+            const {error: bodyError } = fondoSchema.validate(body);
+            if (bodyError) {
+                  return respondError(req, res, 400, bodyError.message);
+            }
+            const [newFondo, errorFondo] = await fondoService.createFondo(body);
+            if (errorFondo) {
+                  return respondError(req, res, 400, errorFondo);
+            }
+            if (!newFondo) {
+                  return respondError(req, res, 400, "No se pudo crear el fondo");
+            }
+            respondSuccess(req, res, 201, newFondo);
       } catch (error) {
-            res.status(400).json({ message: "Error al crear Fondo" });
+            handleError(error, "fondo.controller -> createFondo");
+            respondError(req, res, 500, "No se pudo crear el fondo");
       }
 }
 
 export async function updateFondo(req, res) {
-      try {
-            const fondo = await Fondo.findById(req.params.id);
-            if (!fondo) {
-                  return res.status(404).json({ message: "Fondo no encontrado"});
+      try{
+            const {body, params} = req;
+            const {error: bodyError } = fondoSchema.validate(body);
+            const {error: paramsError } = fondoSchema.validate(params);
+            if (bodyError || paramsError) {
+                  return respondError(req, res, 400, bodyError.message || paramsError.message);
             }
-
-            fondo.nombre = req.body.nombre;
-            fondo.descripcion = req.body.descripcion;
-            fondo.tipo = req.body.tipo;
-            fondo.monto = req.body.monto;
-            fondo.fechaApertura = req.body.fechaApertura;
-            fondo.fechaCierre = req.body.fechaCierre;
-
-
-            const fondoActualizado = await fondo.save();
-                  res.status(200).json(fondoActualizado);
-            } catch (error) {
-                  res.status(400).json({message: "Error al actualizar Fondo"})
+            const [updatedFondo, errorFondo] = await fondoService.updateFondo(params.id, body);
+            if (errorFondo) {
+                  return respondError(req, res, 400, errorFondo);
+            }
+            if (!updatedFondo) {
+                  return respondError(req, res, 400, "No se pudo actualizar el fondo");
+            }
+            respondSuccess(req, res, 200, updatedFondo);
+      } catch (error) {
+            handleError(error, "fondo.controller -> updateFondo");
+            respondError(req, res, 500, "No se pudo actualizar el fondo");
       }
 }
 
 export async function deleteFondo(req, res) {
       try {
-            const fondo = await Fondo.findById(req.params.id);
-
-            if (!fondo) {
-                  return res.status(404).json({ message: "Fondo no encontrado"});
+            const { params } = req;
+            const { error: paramsError } = fondoSchema.validate(params);
+            if (paramsError) {
+                  return respondError(req, res, 400, paramsError.message);
             }
-            await fondo.remove();
-            res.status(200).json({ message: "Fondo eliminado"});
+            const [deletedFondo, errorFondo] = await fondoService.deleteFondo(params.id);
+            if (errorFondo) {
+                  return respondError(req, res, 400, errorFondo);
+            }
+            if (!deletedFondo) {
+                  return respondError(req, res, 400, "No se pudo eliminar el fondo");
+            }
+            respondSuccess(req, res, 200, deletedFondo);
       } catch (error) {
-            res.status(400).json({ message: "Error al eliminar Fondo"});
+            handleError(error, "fondo.controller -> deleteFondo");
+            respondError(req, res, 500, "No se pudo eliminar el fondo");
       }
 }

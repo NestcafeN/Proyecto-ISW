@@ -1,11 +1,11 @@
 import express from "express";
-import { getConcursos, getConcursoById, createConcurso, updateConcurso, deleteConcurso } from '../controllers/concurso.controller.js';
+import { concursoController } from '../controllers/concurso.controller.js';
 const router = express.Router();
 
-router.get('/', getConcursos);
-router.get('/:id', getConcursoById);
-router.post('/', createConcurso);
-router.put('/:id', updateConcurso);
-router.delete('/:id', deleteConcurso);
+router.get('/', concursoController.getConcursos);
+router.get('/:id', concursoController.getConcursoById);
+router.post('/', concursoController.createConcurso);
+router.put('/:id', concursoController.updateConcurso);
+router.delete('/:id', concursoController.deleteConcurso);
 
 export default router;

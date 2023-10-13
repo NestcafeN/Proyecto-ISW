@@ -1,6 +1,6 @@
 "use strict"
 
-const Joi = require("joi");
+import Joi from "joi";
 
 const fondoBodySchema = Joi.object({
       nombre: Joi.string().required().messages({
@@ -36,4 +36,4 @@ const fondoBodySchema = Joi.object({
       
 });
 
-module.exports = fondoBodySchema;
+export default fondoBodySchema;

@@ -1,11 +1,11 @@
 import express from "express";
-import { getFondos, getFondoById, createFondo, updateFondo, deleteFondo } from '../controllers/fondo.controller.js';
+import { fondoController } from '../controllers/fondo.controller.js';
 const router = express.Router();
 
-router.get('/', getFondos);
-router.get('/:id', getFondoById);
-router.post('/', createFondo);
-router.put('/:id', updateFondo);
-router.delete('/:id', deleteFondo);
+router.get('/', fondoController.getFondos);
+router.get('/:id', fondoController.getFondoById);
+router.post('/', fondoController.createFondo);
+router.put('/:id', fondoController.updateFondo);
+router.delete('/:id', fondoController.deleteFondo);
 
 export default router;

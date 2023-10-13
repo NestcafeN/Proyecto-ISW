@@ -38,4 +38,5 @@ const concursoSchema = new Schema({
 });
 
 
-export const Concurso = mongoose.model("Concurso", concursoSchema)
+export const Concurso = mongoose.model("Concurso", concursoSchema);
+export default Concurso;

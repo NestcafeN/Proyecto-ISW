@@ -31,6 +31,6 @@ const fondoSchema = new Schema({
 });
 
 export const Fondo = mongoose.model("Fondo", fondoSchema)
-      
+export default Fondo;
       
       

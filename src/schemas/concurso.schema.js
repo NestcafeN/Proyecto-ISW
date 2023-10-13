@@ -1,6 +1,6 @@
 "use strict"
 
-const Joi = require("joi");
+import Joi from "joi";
 
 const concursoBodySchema = Joi.object({
       nombre: Joi.string().required().messages({
@@ -45,4 +45,4 @@ const concursoBodySchema = Joi.object({
       }),
 });
 
-module.exports = concursoBodySchema;
+export default concursoBodySchema;

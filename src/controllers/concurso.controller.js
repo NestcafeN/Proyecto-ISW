@@ -1,13 +1,13 @@
 "use strict";
 
-import concursoService from "../services/concurso.service.js";
-import handleError from "../utils/errorHandler.js";
+import { handleError } from "../utils/errorHandler.js";
 import { respondSuccess, respondError } from "../utils/resHandler.js";
-import { concursoSchema } from "../schemas/concurso.schema.js";
+import  concursoBodySchema from "../schemas/concurso.schema.js";
+import { concursoService } from "../services/concurso.service.js";
 
-export async function getConcursos(req, res) {
+async function getConcursos(req, res) {
       try {
-            const [concursos, errorConcursos] = await concursoService.getConcursos();
+            const [concursos, errorConcursos] = await concursoService.getConcursos(req, res);
             if (errorConcursos) {
                   return respondError(req, res, 404, errorConcursos);
             }
@@ -20,15 +20,15 @@ export async function getConcursos(req, res) {
       }
 }
 
-export async function getConcursoById(req, res) {
+async function getConcursoById(req, res) {
       try {
             const { params } = req;
-            const { error: paramsError } = concursoSchema.validate(params);
+            const { error: paramsError } = concursoBodySchema.validate(params);
             if (paramsError) {
                   return respondError(req, res, 400, paramsError.message);
             }
 
-            const [concurso, errorConcurso] = await concursoService.getConcursoById(params.id);
+            const [concurso, errorConcurso] = await concursoService.getConcursoById(req, res);
             if (errorConcurso) {
                   return respondError(req, res, 404, errorConcurso);
             }
@@ -39,10 +39,10 @@ export async function getConcursoById(req, res) {
       }
 }
 
-export async function createConcurso(req, res) {
+async function createConcurso(req, res) {
       try {
             const {body} = req;
-            const {error: bodyError } = concursoSchema.validate(body);
+            const {error: bodyError } = concursoBodySchema.validate(body);
             if (bodyError) {
                   return respondError(req, res, 400, bodyError.message);
             }
@@ -60,11 +60,11 @@ export async function createConcurso(req, res) {
       }
 }
 
-export async function updateConcurso(req, res) {
+async function updateConcurso(req, res) {
       try{
             const {body, params} = req;
-            const {error: bodyError} = concursoSchema.validate(body);
-            const {error: paramsError} = concursoSchema.validate(params);
+            const {error: bodyError} = concursoBodySchema.validate(body);
+            const {error: paramsError} = concursoBodySchema.validate(params);
             if (bodyError || paramsError) {
                   return respondError(req, res, 400, bodyError.message || paramsError.message);
             }
@@ -83,10 +83,10 @@ export async function updateConcurso(req, res) {
       }
 }
 
-export async function deleteConcurso(req, res) {
+async function deleteConcurso(req, res) {
       try {
             const {params} = req;
-            const {error: paramsError} = concursoSchema.validate(params);
+            const {error: paramsError} = concursoBodySchema.validate(params);
             if (paramsError) {
                   return respondError(req, res, 400, paramsError.message);
             }
@@ -104,3 +104,5 @@ export async function deleteConcurso(req, res) {
             respondError(req, res, 500, "No se pudo eliminar el concurso");
       }
 }
+
+export const concursoController = { getConcursos, getConcursoById, createConcurso, updateConcurso, deleteConcurso };

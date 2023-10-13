@@ -1,14 +1,14 @@
 "use strict";
 
-const concursoBodySchema = require("../schemas/concurso.schema");
-const { handleError } = require("../utils/errorHandler");
+import { handleError } from "../utils/errorHandler.js";
+import Concurso from "../models/concurso.model.js";
 
-export async function getConcursos(req, res) {
+async function getConcursos() {
       try {
             const concursos = await Concurso.find();
 
             if (!concursos) {
-                  return [null, "No hay concursos registrados"];
+                  return [[], "No hay concursos registrados"];
             }
             return [concursos, null];
       } catch (error) {
@@ -16,9 +16,9 @@ export async function getConcursos(req, res) {
       }
 }
 
-export async function getConcursoById (req, res) {
+async function getConcursoById (id) {
       try {
-            const concurso = await Concurso.findById(req.params.id);
+            const concurso = await Concurso.findById(id);
             if (!concurso) {
                   return [null, "Concurso no encontrado"];
             }
@@ -28,12 +28,12 @@ export async function getConcursoById (req, res) {
       }
 }
 
-export async function createConcurso (req, res) {
+async function createConcurso (concurso) {
       try {
             const {nombre, descripcion, tipo, estado, postulaciones, 
             fechaAperturaConcurso, fechaCierreConcurso, fechaAnuncioGanador} = concurso;
 
-            const concursoFound = await Concurso.findOne({nombre: concurso.nombre});
+            const concursoFound = await Concurso.findOne({nombre});
             if (concursoFound) {
                   return [null, "El concurso ya existe"];
             }
@@ -54,9 +54,9 @@ export async function createConcurso (req, res) {
       }
 }
 
-export async function updateConcurso (req, res) {
+async function updateConcurso (concurso, id) {
       try {
-            const concursoFound = await Concurso.findById(req.params.id);
+            const concursoFound = await Concurso.findById(id);
             if (!concursoFound) {
                   return [null, "Concurso no encontrado"];
             }
@@ -81,11 +81,19 @@ export async function updateConcurso (req, res) {
       }
 }
 
-export async function deleteConcurso (req, res) {
+async function deleteConcurso (id) {
       try {
-            return await Concurso.findByIdAndDelete(req.params.id);
+            return await Concurso.findByIdAndDelete(id);
       } catch (error) {
             handleError(error, "concurso.service -> deleteConcurso");
       }
 }
 
+
+export const concursoService = {
+      getConcursos,
+      getConcursoById,
+      createConcurso,
+      updateConcurso,
+      deleteConcurso
+};

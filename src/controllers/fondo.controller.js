@@ -1,11 +1,12 @@
 "use strict";
 
-import fondoService from "../services/fondo.service.js";
-import handleError from "../utils/errorHandler.js";
-import { respondSuccess, respondError } from "../utils/resHandler.js";
-import { fondoSchema } from "../schemas/fondo.schema.js";
 
-export async function getFondos(req, res) {
+import { handleError } from "../utils/errorHandler.js";
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import  fondoBodySchema  from "../schemas/fondo.schema.js";
+import { fondoService } from "../services/fondo.service.js";
+
+async function getFondos(req, res) {
       try {
             const [fondos, errorFondos] = await fondoService.getFondos();
             if (errorFondos) {
@@ -20,10 +21,10 @@ export async function getFondos(req, res) {
       }
 }
 
-export async function getFondoById(req, res) {
+async function getFondoById(req, res) {
       try {
             const { params } = req;
-            const { error: paramsError } = fondoSchema.validate(params);
+            const { error: paramsError } = fondoBodySchema.validate(params);
             if (paramsError) {
                   return respondError(req, res, 400, paramsError.message);
             }
@@ -39,10 +40,10 @@ export async function getFondoById(req, res) {
       }
 }
 
-export async function createFondo(req, res) {
+async function createFondo(req, res) {
       try {
             const {body} = req;
-            const {error: bodyError } = fondoSchema.validate(body);
+            const {error: bodyError } = fondoBodySchema.validate(body);
             if (bodyError) {
                   return respondError(req, res, 400, bodyError.message);
             }
@@ -60,11 +61,11 @@ export async function createFondo(req, res) {
       }
 }
 
-export async function updateFondo(req, res) {
+async function updateFondo(req, res) {
       try{
             const {body, params} = req;
-            const {error: bodyError } = fondoSchema.validate(body);
-            const {error: paramsError } = fondoSchema.validate(params);
+            const {error: bodyError } = fondoBodySchema.validate(body);
+            const {error: paramsError } = fondoBodySchema.validate(params);
             if (bodyError || paramsError) {
                   return respondError(req, res, 400, bodyError.message || paramsError.message);
             }
@@ -82,23 +83,24 @@ export async function updateFondo(req, res) {
       }
 }
 
-export async function deleteFondo(req, res) {
+async function deleteFondo(req, res) {
       try {
             const { params } = req;
-            const { error: paramsError } = fondoSchema.validate(params);
+            const { error: paramsError } = fondoBodySchema.validate(params);
             if (paramsError) {
                   return respondError(req, res, 400, paramsError.message);
             }
-            const [deletedFondo, errorFondo] = await fondoService.deleteFondo(params.id);
-            if (errorFondo) {
-                  return respondError(req, res, 400, errorFondo);
-            }
-            if (!deletedFondo) {
-                  return respondError(req, res, 400, "No se pudo eliminar el fondo");
-            }
-            respondSuccess(req, res, 200, deletedFondo);
+            const deletedFondo = await fondoService.deleteFondo(params.id);
+            !deletedFondo
+                  ? respondError(req, res, 400,
+                        "No se pudo eliminar el fondo",
+                        "Verifique el id ingresado")
+                  
+                  : respondSuccess(req, res, 200, deletedFondo);
       } catch (error) {
             handleError(error, "fondo.controller -> deleteFondo");
             respondError(req, res, 500, "No se pudo eliminar el fondo");
       }
 }
+
+export const fondoController = { getFondos, getFondoById, createFondo, updateFondo, deleteFondo };

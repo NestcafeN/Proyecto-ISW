@@ -1,7 +1,7 @@
 "use strict";
-// Importa el modelo de datos 'Role'
-const Role = require("../models/role.model.js");
-const User = require("../models/user.model.js");
+
+import Role, { estimatedDocumentCount, findOne } from "../models/role.model.js";
+import User, { estimatedDocumentCount as _estimatedDocumentCount, encryptPassword } from "../models/user.model.js";
 
 /**
  * Crea los roles por defecto en la base de datos.
@@ -12,7 +12,7 @@ const User = require("../models/user.model.js");
 async function createRoles() {
   try {
     // Busca todos los roles en la base de datos
-    const count = await Role.estimatedDocumentCount();
+    const count = await estimatedDocumentCount();
     // Si no hay roles en la base de datos los crea
     if (count > 0) return;
 
@@ -34,23 +34,23 @@ async function createRoles() {
  */
 async function createUsers() {
   try {
-    const count = await User.estimatedDocumentCount();
+    const count = await _estimatedDocumentCount();
     if (count > 0) return;
 
-    const admin = await Role.findOne({ name: "admin" });
-    const user = await Role.findOne({ name: "user" });
+    const admin = await findOne({ name: "admin" });
+    const user = await findOne({ name: "user" });
 
     await Promise.all([
       new User({
         username: "user",
         email: "user@email.com",
-        password: await User.encryptPassword("user123"),
+        password: await encryptPassword("user123"),
         roles: user._id,
       }).save(),
       new User({
         username: "admin",
         email: "admin@email.com",
-        password: await User.encryptPassword("admin123"),
+        password: await encryptPassword("admin123"),
         roles: admin._id,
       }).save(),
     ]);
@@ -60,7 +60,7 @@ async function createUsers() {
   }
 }
 
-module.exports = {
+export default {
   createRoles,
   createUsers,
 };

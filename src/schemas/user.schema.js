@@ -1,12 +1,9 @@
 "use strict";
 
-const Joi = require("joi");
-const ROLES = require("../constants/roles.constants");
+import Joi from "joi";
+import ROLES from "../constants/roles.constants.js";
 
-/**
- * Esquema de validación para el cuerpo de la solicitud de usuario.
- * @constant {Object}
- */
+ 
 const userBodySchema = Joi.object({
   username: Joi.string().required().messages({
     "string.empty": "El nombre de usuario no puede estar vacío.",
@@ -26,7 +23,7 @@ const userBodySchema = Joi.object({
     "string.email": "El email debe tener un formato válido.",
   }),
   roles: Joi.array()
-    .items(Joi.string().valid(...ROLES))
+    .items(string().valid(...ROLES))
     .required()
     .messages({
       "array.base": "El rol debe ser de tipo array.",
@@ -43,10 +40,6 @@ const userBodySchema = Joi.object({
   "object.unknown": "No se permiten propiedades adicionales.",
 });
 
-/**
- * Esquema de validación para el id de usuario.
- * @constant {Object}
- */
 const userIdSchema = Joi.object({
   id: Joi.string()
     .required()
@@ -59,4 +52,4 @@ const userIdSchema = Joi.object({
     }),
 });
 
-module.exports = { userBodySchema, userIdSchema };
+export { userBodySchema, userIdSchema };

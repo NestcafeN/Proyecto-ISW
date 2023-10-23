@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const { Postulation, Notification } = require('./model'); // Importa el modelo de Postulacion y Notificacion
+import { Router } from 'express';
+const router = Router();
+import { Postulation, Notification } from './model'; // Importa el modelo de Postulacion y Notificacion
 
 // Ruta para obtener todas las notificaciones de un usuario
 router.get('/notificaciones/:userId', async (req, res) => {
@@ -36,4 +36,4 @@ router.put('/notificaciones/:notificationId', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

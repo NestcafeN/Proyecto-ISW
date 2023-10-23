@@ -1,15 +1,11 @@
 "use strict";
 
 const { respondSuccess, respondError } = require("../utils/resHandler");
-const UserService = require("../services/user.service");
+const UserService = require("../services/user.service").default;
 const { userBodySchema, userIdSchema } = require("../schema/user.schema");
 const { handleError } = require("../utils/errorHandler");
 
-/**
- * Obtiene todos los usuarios
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+
 async function getUsers(req, res) {
   try {
     const [usuarios, errorUsuarios] = await UserService.getUsers();
@@ -24,11 +20,7 @@ async function getUsers(req, res) {
   }
 }
 
-/**
- * Crea un nuevo usuario
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+
 async function createUser(req, res) {
   try {
     const { body } = req;
@@ -49,11 +41,6 @@ async function createUser(req, res) {
   }
 }
 
-/**
- * Obtiene un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
 async function getUserById(req, res) {
   try {
     const { params } = req;
@@ -71,11 +58,6 @@ async function getUserById(req, res) {
   }
 }
 
-/**
- * Actualiza un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
 async function updateUser(req, res) {
   try {
     const { params, body } = req;
@@ -96,11 +78,7 @@ async function updateUser(req, res) {
   }
 }
 
-/**
- * Elimina un usuario por su id
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+
 async function deleteUser(req, res) {
   try {
     const { params } = req;
@@ -123,10 +101,4 @@ async function deleteUser(req, res) {
   }
 }
 
-module.exports = {
-  getUsers,
-  createUser,
-  getUserById,
-  updateUser,
-  deleteUser,
-};
+export const UserController = { getUsers,createUser,getUserById,updateUser,deleteUser };

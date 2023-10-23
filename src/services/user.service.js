@@ -1,16 +1,13 @@
 "use strict";
-// Importa el modelo de datos 'User'
-const User = require("../models/user.model.js");
-const Role = require("../models/role.model.js");
-const { handleError } = require("../utils/errorHandler");
 
-/**
- * Obtiene todos los usuarios de la base de datos
- * @returns {Promise} Promesa con el objeto de los usuarios
- */
+import User, { find, findOne, encryptPassword, findById, comparePassword, findByIdAndUpdate, findByIdAndDelete } from "../models/user.model.js";
+import { find as _find } from "../models/role.model.js";
+import { handleError } from "../utils/errorHandler";
+
+
 async function getUsers() {
   try {
-    const users = await User.find()
+    const users = await find()
       .select("-password")
       .populate("roles")
       .exec();
@@ -22,26 +19,21 @@ async function getUsers() {
   }
 }
 
-/**
- * Crea un nuevo usuario en la base de datos
- * @param {Object} user Objeto de usuario
- * @returns {Promise} Promesa con el objeto de usuario creado
- */
 async function createUser(user) {
   try {
     const { username, email, password, roles } = user;
 
-    const userFound = await User.findOne({ email: user.email });
+    const userFound = await findOne({ email: user.email });
     if (userFound) return [null, "El usuario ya existe"];
 
-    const rolesFound = await Role.find({ name: { $in: roles } });
+    const rolesFound = await _find({ name: { $in: roles } });
     if (rolesFound.length === 0) return [null, "El rol no existe"];
     const myRole = rolesFound.map((role) => role._id);
 
     const newUser = new User({
       username,
       email,
-      password: await User.encryptPassword(password),
+      password: await encryptPassword(password),
       roles: myRole,
     });
     await newUser.save();
@@ -52,14 +44,9 @@ async function createUser(user) {
   }
 }
 
-/**
- * Obtiene un usuario por su id de la base de datos
- * @param {string} Id del usuario
- * @returns {Promise} Promesa con el objeto de usuario
- */
 async function getUserById(id) {
   try {
-    const user = await User.findById({ _id: id })
+    const user = await findById({ _id: id })
       .select("-password")
       .populate("roles")
       .exec();
@@ -72,20 +59,15 @@ async function getUserById(id) {
   }
 }
 
-/**
- * Actualiza un usuario por su id en la base de datos
- * @param {string} id Id del usuario
- * @param {Object} user Objeto de usuario
- * @returns {Promise} Promesa con el objeto de usuario actualizado
- */
+
 async function updateUser(id, user) {
   try {
-    const userFound = await User.findById(id);
+    const userFound = await findById(id);
     if (!userFound) return [null, "El usuario no existe"];
 
     const { username, email, password, newPassword, roles } = user;
 
-    const matchPassword = await User.comparePassword(
+    const matchPassword = await comparePassword(
       password,
       userFound.password,
     );
@@ -94,17 +76,17 @@ async function updateUser(id, user) {
       return [null, "La contraseña no coincide"];
     }
 
-    const rolesFound = await Role.find({ name: { $in: roles } });
+    const rolesFound = await _find({ name: { $in: roles } });
     if (rolesFound.length === 0) return [null, "El rol no existe"];
 
     const myRole = rolesFound.map((role) => role._id);
 
-    const userUpdated = await User.findByIdAndUpdate(
+    const userUpdated = await findByIdAndUpdate(
       id,
       {
         username,
         email,
-        password: await User.encryptPassword(newPassword || password),
+        password: await encryptPassword(newPassword || password),
         roles: myRole,
       },
       { new: true },
@@ -116,20 +98,16 @@ async function updateUser(id, user) {
   }
 }
 
-/**
- * Elimina un usuario por su id de la base de datos
- * @param {string} Id del usuario
- * @returns {Promise} Promesa con el objeto de usuario eliminado
- */
+
 async function deleteUser(id) {
   try {
-    return await User.findByIdAndDelete(id);
+    return await findByIdAndDelete(id);
   } catch (error) {
     handleError(error, "user.service -> deleteUser");
   }
 }
 
-module.exports = {
+export default {
   getUsers,
   createUser,
   getUserById,

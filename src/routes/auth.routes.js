@@ -1,17 +1,10 @@
 "use strict";
-// Importa el modulo 'express' para crear las rutas
-const express = require("express");
+import { Router } from "express";
+import { login, logout, refresh } from "../controllers/auth.controller.js";
+const router = Router();
 
-/** Controlador de autenticación */
-const authController = require("../controllers/auth.controller.js");
+router.post("/login", login);
+router.post("/logout", logout);
+router.get("/refresh", refresh);
 
-/** Instancia del enrutador */
-const router = express.Router();
-
-// Define las rutas para la autenticación
-router.post("/login", authController.login);
-router.post("/logout", authController.logout);
-router.get("/refresh", authController.refresh);
-
-// Exporta el enrutador
-module.exports = router;
+export default router;

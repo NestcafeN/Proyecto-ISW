@@ -1,9 +1,9 @@
 "use strict";
 // Autorizacion - Comprobar el rol del usuario
-const User = require("../models/user.model.js");
-const Role = require("../models/role.model.js");
-const { respondError } = require("../utils/resHandler.js");
-const { handleError } = require("../utils/errorHandler.js");
+import { findOne } from "../models/user.model.js";
+import { find } from "../models/role.model.js";
+import { respondError } from "../utils/resHandler.js";
+import { handleError } from "../utils/errorHandler.js";
 
 /**
  * Comprueba si el usuario es administrador
@@ -13,8 +13,8 @@ const { handleError } = require("../utils/errorHandler.js");
  */
 async function isAdmin(req, res, next) {
   try {
-    const user = await User.findOne({ email: req.email });
-    const roles = await Role.find({ _id: { $in: user.roles } });
+    const user = await findOne({ email: req.email });
+    const roles = await find({ _id: { $in: user.roles } });
     for (let i = 0; i < roles.length; i++) {
       if (roles[i].name === "admin") {
         next();
@@ -32,6 +32,4 @@ async function isAdmin(req, res, next) {
   }
 }
 
-module.exports = {
-  isAdmin,
-};
+export default { isAdmin };

@@ -1,8 +1,8 @@
-const nodemailer = require('nodemailer');
-const { User, Postulation } = require('./model');
+import { createTransport } from 'nodemailer';
+import { User, Postulation } from './model';
 
 // Configuración de transporte de correo electrónico (usando nodemailer)
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   service: 'Gmail', // Proveedor de correo electrónico
   auth: {
     user: '', // correo electrónico
@@ -43,6 +43,6 @@ async function notifyPostulationStatus(PostulacionId, status) {
 }
 
 
-module.exports = {
+export default {
   notifyPostulationStatus,
 };

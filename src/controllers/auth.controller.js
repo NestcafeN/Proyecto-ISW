@@ -1,19 +1,13 @@
 "use strict";
 
-const { respondSuccess, respondError } = require("../utils/resHandler");
-const { handleError } = require("../utils/errorHandler");
+import { respondSuccess, respondError } from "../utils/resHandler";
+import { handleError } from "../utils/errorHandler";
 
 /** Servicios de autenticación */
-const AuthServices = require("../services/auth.service");
-const { authLoginBodySchema } = require("../schema/auth.schema");
+import { login as _login, refresh as _refresh } from "../services/auth.service";
+import { authLoginBodySchema } from "../schema/auth.schema";
 
-/**
- * Inicia sesión con un usuario.
- * @async
- * @function login
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
+
 async function login(req, res) {
   try {
     const { body } = req;
@@ -21,7 +15,7 @@ async function login(req, res) {
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
     const [accessToken, refreshToken, errorToken] =
-      await AuthServices.login(body);
+      await _login(body);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
@@ -38,13 +32,6 @@ async function login(req, res) {
   }
 }
 
-/**
- * @name logout
- * @description Cierra la sesión del usuario
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- * @returns
- */
 async function logout(req, res) {
   try {
     const cookies = req.cookies;
@@ -57,18 +44,12 @@ async function logout(req, res) {
   }
 }
 
-/**
- * @name refresh
- * @description Refresca el token de acceso
- * @param {Object} req - Objeto de petición
- * @param {Object} res - Objeto de respuesta
- */
 async function refresh(req, res) {
   try {
     const cookies = req.cookies;
     if (!cookies?.jwt) return respondError(req, res, 400, "No hay token");
 
-    const [accessToken, errorToken] = await AuthServices.refresh(cookies);
+    const [accessToken, errorToken] = await _refresh(cookies);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
@@ -79,8 +60,4 @@ async function refresh(req, res) {
   }
 }
 
-module.exports = {
-  login,
-  logout,
-  refresh,
-};
+export default { login,logout,refresh };

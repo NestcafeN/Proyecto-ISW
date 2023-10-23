@@ -1,8 +1,8 @@
 "use strict";
 
-const jwt = require("jsonwebtoken");
-const { ACCESS_JWT_SECRET } = require("../config/configEnv");
-const { respondError } = require("../utils/resHandler");
+import { verify } from "jsonwebtoken";
+import { ACCESS_JWT_SECRET } from "../config/configEnv";
+import { respondError } from "../utils/resHandler";
 /**
  * Verifica el token de acceso
  * @param {Object} req - Objeto de petición
@@ -25,7 +25,7 @@ const verifyJWT = (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    jwt.verify(token, ACCESS_JWT_SECRET, (err, decoded) => {
+    verify(token, ACCESS_JWT_SECRET, (err, decoded) => {
       if (err) return respondError(req, res, 403, "No autorizado", err.message);
       req.email = decoded.email;
       req.roles = decoded.roles;
@@ -36,4 +36,4 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-module.exports = verifyJWT;
+export default verifyJWT;

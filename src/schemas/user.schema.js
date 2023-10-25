@@ -3,7 +3,6 @@
 import Joi from "joi";
 import ROLES from "../constants/roles.constants.js";
 
- 
 const userBodySchema = Joi.object({
   username: Joi.string().required().messages({
     "string.empty": "El nombre de usuario no puede estar vacío.",
@@ -23,7 +22,7 @@ const userBodySchema = Joi.object({
     "string.email": "El email debe tener un formato válido.",
   }),
   roles: Joi.array()
-    .items(string().valid(...ROLES))
+    .items(Joi.string().valid(...ROLES))
     .required()
     .messages({
       "array.base": "El rol debe ser de tipo array.",

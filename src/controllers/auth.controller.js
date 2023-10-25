@@ -1,12 +1,9 @@
 "use strict";
 
-import { respondSuccess, respondError } from "../utils/resHandler";
-import { handleError } from "../utils/errorHandler";
-
-/** Servicios de autenticación */
-import { login as _login, refresh as _refresh } from "../services/auth.service";
-import { authLoginBodySchema } from "../schema/auth.schema";
-
+import { handleError } from "../utils/errorHandler.js";
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { authServices }from "../services/auth.service.js";
+import { authLoginBodySchema } from "../schemas/auth.schema.js";
 
 async function login(req, res) {
   try {
@@ -15,7 +12,7 @@ async function login(req, res) {
     if (bodyError) return respondError(req, res, 400, bodyError.message);
 
     const [accessToken, refreshToken, errorToken] =
-      await _login(body);
+      await authServices.login(body);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
@@ -49,7 +46,7 @@ async function refresh(req, res) {
     const cookies = req.cookies;
     if (!cookies?.jwt) return respondError(req, res, 400, "No hay token");
 
-    const [accessToken, errorToken] = await _refresh(cookies);
+    const [accessToken, errorToken] = await authServices.refresh(cookies);
 
     if (errorToken) return respondError(req, res, 400, errorToken);
 
@@ -60,4 +57,4 @@ async function refresh(req, res) {
   }
 }
 
-export default { login,logout,refresh };
+export const authController = { login, logout, refresh };

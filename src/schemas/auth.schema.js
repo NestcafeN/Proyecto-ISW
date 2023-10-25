@@ -18,4 +18,4 @@ const authLoginBodySchema = Joi.object({
   "object.unknown": "No se permiten propiedades adicionales.",
 });
 
-export default { authLoginBodySchema };
+export { authLoginBodySchema };

@@ -1,13 +1,9 @@
 "use strict";
 
-/** Modelo de datos 'User' */
-import { findOne, comparePassword } from "../models/user.model.js";
 
-/** Modulo 'jsonwebtoken' para crear tokens */
-import { sign, verify } from "jsonwebtoken";
-
+import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 import { ACCESS_JWT_SECRET, REFRESH_JWT_SECRET } from "../config/configEnv.js";
-
 import { handleError } from "../utils/errorHandler.js";
 
 /**
@@ -20,14 +16,14 @@ async function login(user) {
   try {
     const { email, password } = user;
 
-    const userFound = await findOne({ email: email })
+    const userFound = await User.findOne({ email: email })
       .populate("roles")
       .exec();
     if (!userFound) {
       return [null, null, "El usuario y/o contraseña son incorrectos"];
     }
 
-    const matchPassword = await comparePassword(
+    const matchPassword = await User.comparePassword(
       password,
       userFound.password,
     );
@@ -36,7 +32,7 @@ async function login(user) {
       return [null, null, "El usuario y/o contraseña son incorrectos"];
     }
 
-    const accessToken = sign(
+    const accessToken = jwt.sign(
       { email: userFound.email, roles: userFound.roles },
       ACCESS_JWT_SECRET,
       {
@@ -44,7 +40,7 @@ async function login(user) {
       },
     );
 
-    const refreshToken = sign(
+    const refreshToken = jwt.sign(
       { email: userFound.email },
       REFRESH_JWT_SECRET,
       {
@@ -69,13 +65,13 @@ async function refresh(cookies) {
     if (!cookies.jwt) return [null, "No hay autorización"];
     const refreshToken = cookies.jwt;
 
-    const accessToken = await verify(
+    const accessToken = await jwt.verify(
       refreshToken,
       REFRESH_JWT_SECRET,
       async (err, user) => {
         if (err) return [null, "La sesion a caducado, vuelva a iniciar sesion"];
 
-        const userFound = await findOne({
+        const userFound = await User.findOne({
           email: user.email,
         })
           .populate("roles")
@@ -83,7 +79,7 @@ async function refresh(cookies) {
 
         if (!userFound) return [null, "No usuario no autorizado"];
 
-        const accessToken = sign(
+        const accessToken = jwt.sign(
           { email: userFound.email, roles: userFound.roles },
           ACCESS_JWT_SECRET,
           {
@@ -101,7 +97,7 @@ async function refresh(cookies) {
   }
 }
 
-export default {
+export const authServices = {
   login,
   refresh,
 };

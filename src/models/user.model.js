@@ -1,7 +1,9 @@
-"use strict"
+"use strict";
 
-import { Schema, model } from "mongoose";
-import { genSalt, hash, compare } from "bcryptjs";
+import mongoose from "mongoose";
+const { Schema } = mongoose;
+import bcryptjs from "bcryptjs";
+const { genSalt, hash, compare } = bcryptjs;
 
 const userSchema = new Schema(
   {
@@ -27,7 +29,7 @@ const userSchema = new Schema(
   },
   {
     versionKey: false,
-  },
+  }
 );
 
 /** Encripta la contraseña del usuario */
@@ -41,5 +43,5 @@ userSchema.statics.comparePassword = async (password, receivedPassword) => {
   return await compare(password, receivedPassword);
 };
 
-const User = model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
 export default User;

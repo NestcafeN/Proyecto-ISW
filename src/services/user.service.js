@@ -1,13 +1,13 @@
 "use strict";
 
-import User, { find, findOne, encryptPassword, findById, comparePassword, findByIdAndUpdate, findByIdAndDelete } from "../models/user.model.js";
-import { find as _find } from "../models/role.model.js";
-import { handleError } from "../utils/errorHandler";
+import User from "../models/user.model.js";
+import Role from "../models/role.model.js";
+import { handleError } from "../utils/errorHandler.js";
 
 
 async function getUsers() {
   try {
-    const users = await find()
+    const users = await User.find()
       .select("-password")
       .populate("roles")
       .exec();
@@ -23,17 +23,17 @@ async function createUser(user) {
   try {
     const { username, email, password, roles } = user;
 
-    const userFound = await findOne({ email: user.email });
+    const userFound = await User.findOne({ email: user.email });
     if (userFound) return [null, "El usuario ya existe"];
 
-    const rolesFound = await _find({ name: { $in: roles } });
+    const rolesFound = await Role.find({ name: { $in: roles } });
     if (rolesFound.length === 0) return [null, "El rol no existe"];
     const myRole = rolesFound.map((role) => role._id);
 
     const newUser = new User({
       username,
       email,
-      password: await encryptPassword(password),
+      password: await User.encryptPassword(password),
       roles: myRole,
     });
     await newUser.save();
@@ -46,7 +46,7 @@ async function createUser(user) {
 
 async function getUserById(id) {
   try {
-    const user = await findById({ _id: id })
+    const user = await User.findById({ _id: id })
       .select("-password")
       .populate("roles")
       .exec();
@@ -62,12 +62,12 @@ async function getUserById(id) {
 
 async function updateUser(id, user) {
   try {
-    const userFound = await findById(id);
+    const userFound = await User.findById(id);
     if (!userFound) return [null, "El usuario no existe"];
 
     const { username, email, password, newPassword, roles } = user;
 
-    const matchPassword = await comparePassword(
+    const matchPassword = await User.comparePassword(
       password,
       userFound.password,
     );
@@ -76,17 +76,17 @@ async function updateUser(id, user) {
       return [null, "La contraseña no coincide"];
     }
 
-    const rolesFound = await _find({ name: { $in: roles } });
+    const rolesFound = await Role.find({ name: { $in: roles } });
     if (rolesFound.length === 0) return [null, "El rol no existe"];
 
     const myRole = rolesFound.map((role) => role._id);
 
-    const userUpdated = await findByIdAndUpdate(
+    const userUpdated = await User.findByIdAndUpdate(
       id,
       {
         username,
         email,
-        password: await encryptPassword(newPassword || password),
+        password: await User.encryptPassword(newPassword || password),
         roles: myRole,
       },
       { new: true },
@@ -101,13 +101,13 @@ async function updateUser(id, user) {
 
 async function deleteUser(id) {
   try {
-    return await findByIdAndDelete(id);
+    return await User.findByIdAndDelete(id);
   } catch (error) {
     handleError(error, "user.service -> deleteUser");
   }
 }
 
-export default {
+export const UserService = {
   getUsers,
   createUser,
   getUserById,

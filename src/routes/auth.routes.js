@@ -1,10 +1,10 @@
 "use strict";
-import { Router } from "express";
-import { login, logout, refresh } from "../controllers/auth.controller.js";
-const router = Router();
+import express from "express";
+import { authController } from "../controllers/auth.controller.js";
+const router = express.Router();
 
-router.post("/login", login);
-router.post("/logout", logout);
-router.get("/refresh", refresh);
+router.post("/login", authController.login);
+router.post("/logout", authController.logout);
+router.get("/refresh", authController.refresh);
 
 export default router;

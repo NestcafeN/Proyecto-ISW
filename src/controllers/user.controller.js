@@ -1,10 +1,9 @@
 "use strict";
 
-const { respondSuccess, respondError } = require("../utils/resHandler");
-const UserService = require("../services/user.service").default;
-const { userBodySchema, userIdSchema } = require("../schema/user.schema");
-const { handleError } = require("../utils/errorHandler");
-
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { UserService } from "../services/user.service.js";
+import { userBodySchema, userIdSchema } from "../schemas/user.schema.js";
+import { handleError } from "../utils/errorHandler.js";
 
 async function getUsers(req, res) {
   try {
@@ -19,7 +18,6 @@ async function getUsers(req, res) {
     respondError(req, res, 400, error.message);
   }
 }
-
 
 async function createUser(req, res) {
   try {
@@ -78,7 +76,6 @@ async function updateUser(req, res) {
   }
 }
 
-
 async function deleteUser(req, res) {
   try {
     const { params } = req;
@@ -92,7 +89,7 @@ async function deleteUser(req, res) {
           res,
           404,
           "No se encontro el usuario solicitado",
-          "Verifique el id ingresado",
+          "Verifique el id ingresado"
         )
       : respondSuccess(req, res, 200, user);
   } catch (error) {
@@ -101,4 +98,10 @@ async function deleteUser(req, res) {
   }
 }
 
-export const UserController = { getUsers,createUser,getUserById,updateUser,deleteUser };
+export const UserController = {
+  getUsers,
+  createUser,
+  getUserById,
+  updateUser,
+  deleteUser,
+};

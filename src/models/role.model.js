@@ -1,7 +1,8 @@
-"use strict"
+"use strict";
 
-import { Schema, model } from "mongoose";
-import ROLES from "../constants/roles.constants";
+import mongoose from "mongoose";
+const { Schema } = mongoose;
+import ROLES from "../constants/roles.constants.js";
 
 // Crea el esquema de la coleccion 'roles'
 const roleSchema = new Schema(
@@ -14,10 +15,9 @@ const roleSchema = new Schema(
   },
   {
     versionKey: false,
-  },
+  }
 );
 
 // Crea el modelo de datos 'Role' a partir del esquema 'roleSchema'
-const Role = model("Role", roleSchema);
-
+export const Role = mongoose.model("Role", roleSchema);
 export default Role;

@@ -65,9 +65,10 @@ export async function deleteRubrica(req, res) {
             return res.status(404).json({ message: "Rúbrica no encontrada" });
         }
 
-        await rubrica.remove();
+        await rubrica.deleteOne();
         res.status(200).json({ message: "Rúbrica eliminada correctamente" });
     } catch (error) {
+        console.error(error);
         res.status(400).json({ message: "Error al eliminar Rúbrica" });
     }
 }

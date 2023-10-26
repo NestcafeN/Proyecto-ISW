@@ -1,11 +1,11 @@
 import express from "express";
-import {getRubricas, getRubrica, createRubrica, updateRubrica, deleteRubrica} from '../controllers/rubrica.controller.js';
+import { rubricaController } from '../controllers/rubrica.controller.js';
 const router = express.Router();
 
-router.get('/', getRubricas);
-router.get('/:id', getRubrica);
-router.post('/', createRubrica);
-router.put('/:id', updateRubrica);
-router.delete('/:id', deleteRubrica);
+router.get("/", rubricaController.getRubricas);
+router.get("/:id", rubricaController.getRubricaById);
+router.post("/", rubricaController.createRubrica);
+router.put("/:id", rubricaController.updateRubrica);
+router.delete("/:id", rubricaController.deleteRubrica);
 
 export default router;

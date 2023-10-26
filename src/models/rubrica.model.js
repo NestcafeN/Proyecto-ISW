@@ -1,20 +1,7 @@
 import mongoose from "mongoose";
-const { Schema } = mongoose;
+import { Criterio } from "./criterio.model.js";
 
-const criterioSchema = new Schema({
-    nombre: {
-        type: String,
-        required: true,
-    },
-    descripcion: {
-        type: String,
-        required: true,
-    },
-    puntaje: {
-        type: Number,
-    required: true,
-    },
-});
+const { Schema } = mongoose;
 
 const rubricaSchema = new Schema({
     nombre: {
@@ -26,7 +13,7 @@ const rubricaSchema = new Schema({
         type: String,
         required: true,
     },
-    criterios: [criterioSchema],
+    criterios: [Criterio.schema],
     puntajeMinimoAprobacion: {
         type: Number,
         required: true,
@@ -46,3 +33,4 @@ const rubricaSchema = new Schema({
 });
 
 export const Rubrica = mongoose.model("Rubrica", rubricaSchema);
+export default Rubrica;

@@ -29,7 +29,7 @@ export async function createPostulacion(req, res) {
                 correo:req.body.correo,
                 direccion: req.body.direccion,
                 proyecto: req.body.proyecto,
-                concurso: req.body.concurso,
+                estado: req.body.estado,
                 fechaPostulacion: req.body.fechaPostulacion,
           });
           const nuevaPostulacion = await postulacion.save();
@@ -50,7 +50,7 @@ export async function updatePostulacion(req, res) {
                 postulacion.rut= req.body.rut,
                 postulacion.direccion= req.body.direccion,
                 postulacion.proyecto= req.body.proyecto,
-                postulacion.concurso= req.body.concurso,
+                postulacion.estado= req.body.estado,
                 postulacion.fechaPostulacion= req.body.fechaPostulacion
 
                 const postulacionActualizada = await postulacion.save();

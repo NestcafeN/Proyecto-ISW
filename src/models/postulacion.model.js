@@ -32,10 +32,11 @@ const postulacionSchema = new Schema({
             type: String,
             required: true,
             },
-      concurso: {
+      estado: {
             type: String,
             required: true,
-            },
+            enum: ["R", "r", "A", "a", "E", "e"],
+      },
       fechaPostulacion: {
             type: Date,
             required: true,

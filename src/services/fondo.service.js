@@ -30,8 +30,15 @@ async function getFondoById(id) {
 
 async function createFondo(fondo) {
   try {
-    const { nombre, descripcion, tipo, monto, fechaApertura, fechaCierre } =
-      fondo;
+    const {
+      nombre,
+      descripcion,
+      categoria,
+      montoMax,
+      fechaApertura,
+      fechaCierre,
+      concursos,
+    } = fondo;
 
     const fondoFound = await Fondo.findOne({ nombre });
     if (fondoFound) {
@@ -40,15 +47,71 @@ async function createFondo(fondo) {
     const newFondo = new Fondo({
       nombre,
       descripcion,
-      tipo,
-      monto,
+      categoria,
+      montoMax,
       fechaApertura,
       fechaCierre,
+      concursos,
     });
+    await newFondo.validate();
     await newFondo.save();
     return [newFondo, null];
   } catch (error) {
-    handleError(error, "fondo.service -> createFondo");
+    // Procesa el error de validación de Mongoose para obtener los mensajes de error
+    if (error.errors) {
+      const validationErrors = {};
+      for (const key in error.errors) {
+        if (error.errors.hasOwnProperty(key)) {
+          validationErrors[key] = error.errors[key].message;
+        }
+      }
+      return [null, validationErrors];
+    } else {
+      handleError(error, "fondo.service -> createFondo");
+    }
+  }
+}
+
+async function updateIdConcurso(id, concursos) {
+  try {
+    const fondoFound = await Fondo.findById(id);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
+    }
+    const updatedFondo = await Fondo.findByIdAndUpdate(
+      id,
+      { concursos },
+      { new: true }
+    );
+    if (!updatedFondo) {
+      return [null, "Fondo no encontrado"];
+    }
+
+    return [updatedFondo, null];
+  } catch (error) {
+    handleError(error, "fondo.service -> updateFondo");
+  }
+}
+
+async function updateMontoMaximo(id, montoMaximo) {
+  try {
+    const fondoFound = await Fondo.findById(id);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
+    }
+    const updatedFondo = await Fondo.findByIdAndUpdate(
+      id,
+      { montoMax: montoMaximo },
+      { new: true }
+    );
+
+    if (!updatedFondo) {
+      return [null, "Fondo no encontrado"];
+    }
+
+    return [updatedFondo, null];
+  } catch (error) {
+    handleError(error, "fondo.service -> updateFondo");
   }
 }
 
@@ -58,17 +121,25 @@ async function updateFondo(id, fondo) {
     if (!fondoFound) {
       return [null, "Fondo no encontrado"];
     }
-    const { nombre, descripcion, tipo, monto, fechaApertura, fechaCierre } =
-      fondo;
+    const {
+      nombre,
+      descripcion,
+      categoria,
+      montoMax,
+      fechaApertura,
+      fechaCierre,
+      concursos,
+    } = fondo;
     const fondoUpdated = await Fondo.findByIdAndUpdate(
       id,
       {
         nombre,
         descripcion,
-        tipo,
-        monto,
+        categoria,
+        montoMax,
         fechaApertura,
         fechaCierre,
+        concursos,
       },
       {
         new: true,
@@ -92,6 +163,8 @@ export const fondoService = {
   getFondos,
   getFondoById,
   createFondo,
+  updateIdConcurso,
+  updateMontoMaximo,
   updateFondo,
   deleteFondo,
 };

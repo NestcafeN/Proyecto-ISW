@@ -50,13 +50,66 @@ async function createFondo(req, res) {
     if (errorFondo) {
       return respondError(req, res, 400, errorFondo);
     }
-    if (!newFondo) {
-      return respondError(req, res, 400, "No se pudo crear el fondo");
+    if (newFondo) {
+      return respondSuccess(req, res, 201, newFondo);
+    } else {
+      if (errorFondo) {
+        // Devuelve los mensajes de validación como respuesta
+        return respondError(req, res, 400, "Error de validación", errorFondo);
+      } else {
+        return respondError(req, res, 400, "No se pudo crear el fondo");
+      }
     }
-    respondSuccess(req, res, 201, newFondo);
   } catch (error) {
     handleError(error, "fondo.controller -> createFondo");
     respondError(req, res, 500, "No se pudo crear el fondo");
+  }
+}
+
+async function updateIdConcurso(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = fondoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+
+    const { id } = params;
+    const { concursos } = body;
+    const updatedFondo = await fondoService.updateIdConcurso(id, concursos);
+    if (!updatedFondo) {
+      return respondError(req, res, 404, "Fondo no encontrado");
+    }
+    respondSuccess(req, res, 200, updatedFondo);
+  } catch (error) {
+    handleError(error, "fondo.controller -> updateIdConcurso");
+    respondError(req, res, 500, "No se pudo actualizar el id del concurso");
+  }
+}
+
+async function updateMontoMaximo(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = fondoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+    const { id } = params;
+    const { montoMax } = body;
+    const updatedFondo = await fondoService.updateMontoMaximo(id, montoMax);
+
+    if (!updatedFondo) {
+      return respondError(req, res, 404, "Fondo no encontrado");
+    }
+    respondSuccess(req, res, 200, updatedFondo);
+  } catch (error) {
+    handleError(error, "fondo.controller -> updateMontoMaximo");
+    respondError(
+      req,
+      res,
+      500,
+      "No se pudo actualizar el monto máximo del fondo"
+    );
   }
 }
 
@@ -111,6 +164,8 @@ export const fondoController = {
   getFondos,
   getFondoById,
   createFondo,
+  updateIdConcurso,
+  updateMontoMaximo,
   updateFondo,
   deleteFondo,
 };

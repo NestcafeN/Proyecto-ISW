@@ -64,16 +64,6 @@ async function createConcurso(req, res) {
     if (!newConcurso) {
       return respondError(req, res, 400, "No se pudo crear el concurso");
     }
-    if (req.body.postulaciones && Array.isArray(req.body.postulaciones)) {
-      newConcurso.postulaciones = req.body.postulaciones;
-      await newConcurso.save();
-    }
-    const fondoId = req.body.fondoId;
-    if (fondoId) {
-      await Fondo.findByIdAndUpdate(fondoId, {
-        $push: { concursos: newConcurso._id },
-      });
-    }
     respondSuccess(req, res, 201, newConcurso);
   } catch (error) {
     handleError(error, "concurso.controller -> createConcurso");

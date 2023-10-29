@@ -33,12 +33,11 @@ async function createConcurso(concurso) {
     const {
       nombre,
       descripcion,
-      tipo,
       estado,
       postulaciones,
       fechaAperturaConcurso,
       fechaCierreConcurso,
-      fechaAnuncioGanador,
+      fechaAnuncioGanadores,
     } = concurso;
 
     const concursoFound = await Concurso.findOne({ nombre });
@@ -48,12 +47,11 @@ async function createConcurso(concurso) {
     const newConcurso = new Concurso({
       nombre,
       descripcion,
-      tipo,
       estado,
       postulaciones,
       fechaAperturaConcurso,
       fechaCierreConcurso,
-      fechaAnuncioGanador,
+      fechaAnuncioGanadores,
     });
     await newConcurso.save();
     return [newConcurso, null];
@@ -71,24 +69,22 @@ async function updateConcurso(id, concurso) {
     const {
       nombre,
       descripcion,
-      tipo,
       estado,
       postulaciones,
       fechaAperturaConcurso,
       fechaCierreConcurso,
-      fechaAnuncioGanador,
+      fechaAnuncioGanadores,
     } = concurso;
     const concursoUpdated = await Concurso.findByIdAndUpdate(
       id,
       {
         nombre,
         descripcion,
-        tipo,
         estado,
         postulaciones,
         fechaAperturaConcurso,
         fechaCierreConcurso,
-        fechaAnuncioGanador,
+        fechaAnuncioGanadores,
       },
       {
         new: true,

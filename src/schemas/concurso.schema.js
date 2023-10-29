@@ -13,11 +13,6 @@ const concursoBodySchema = Joi.object({
     "any.required": "La descripcion del concurso es obligatoria",
     "string base": "La descripcion del concurso debe ser de tipo string",
   }),
-  tipo: Joi.string().required().messages({
-    "string.empty": "El tipo del concurso no puede estar vacio",
-    "any.required": "El tipo del concurso es obligatorio",
-    "string base": "El tipo del concurso debe ser de tipo string",
-  }),
   estado: Joi.string().required().messages({
     "string.empty": "El estado del concurso no puede estar vacio",
     "any.required": "El estado del concurso es obligatorio",
@@ -38,13 +33,13 @@ const concursoBodySchema = Joi.object({
     "any.required": "La fecha de cierre del concurso es obligatoria",
     "date base": "La fecha de cierre del concurso debe ser de tipo date",
   }),
-  fechaAnuncioGanador: Joi.date().required().messages({
+  fechaAnuncioGanadores: Joi.date().required().messages({
     "date.empty":
-      "La fecha de anuncio del ganador del concurso no puede estar vacia",
+      "La fecha de anuncio de los ganadores del concurso no puede estar vacia",
     "any.required":
-      "La fecha de anuncio del ganador del concurso es obligatoria",
+      "La fecha de anuncio de los ganadores del concurso es obligatoria",
     "date base":
-      "La fecha de anuncio del ganador del concurso debe ser de tipo date",
+      "La fecha de anuncio de los ganadores del concurso debe ser de tipo date",
   }),
 });
 

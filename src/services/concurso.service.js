@@ -5,7 +5,7 @@ import Concurso from "../models/concurso.model.js";
 
 async function getConcursos() {
   try {
-    const concursos = await Concurso.find();
+    const concursos = await Concurso.find().populate("postulaciones").exec();
 
     if (!concursos) {
       return [[], "No hay concursos registrados"];

@@ -5,7 +5,7 @@ import Fondo from "../models/fondo.model.js";
 
 async function getFondos() {
   try {
-    const fondos = await Fondo.find();
+    const fondos = await Fondo.find().populate("concursos").exec();
 
     if (!fondos) {
       return [null, "No hay fondos registrados"];

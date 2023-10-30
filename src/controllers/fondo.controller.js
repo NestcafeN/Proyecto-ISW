@@ -66,7 +66,7 @@ async function createFondo(req, res) {
   }
 }
 
-async function updateIdConcurso(req, res) {
+async function addConcursoId(req, res) {
   try {
     const { body, params } = req;
     const { error: paramsError } = fondoIdSchema.validate(params);
@@ -76,7 +76,7 @@ async function updateIdConcurso(req, res) {
 
     const { id } = params;
     const { concursos } = body;
-    const updatedFondo = await fondoService.updateIdConcurso(id, concursos);
+    const updatedFondo = await fondoService.addConcursoId(id, concursos);
     if (!updatedFondo) {
       return respondError(req, res, 404, "Fondo no encontrado");
     }
@@ -160,12 +160,41 @@ async function deleteFondo(req, res) {
   }
 }
 
+async function deleteConcursoId(req, res) {
+  try {
+    const { params } = req;
+    const { error: paramsError } = fondoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+
+    const { id } = params;
+    const { concursoId } = req.body;
+
+    const updatedFondo = await fondoService.deleteConcursoId(id, concursoId);
+
+    if (!updatedFondo) {
+      return respondError(
+        req,
+        res,
+        404,
+        "No se pudo eliminar el concurso del Fondo"
+      );
+    }
+    respondSuccess(req, res, 200, updatedFondo);
+  } catch (error) {
+    handleError(error, "fondo.controller -> deleteConcursoId");
+    respondError(req, res, 500, "No se pudo eliminar el concurso del fondo");
+  }
+}
+
 export const fondoController = {
   getFondos,
   getFondoById,
   createFondo,
-  updateIdConcurso,
+  addConcursoId,
   updateMontoMaximo,
   updateFondo,
   deleteFondo,
+  deleteConcursoId,
 };

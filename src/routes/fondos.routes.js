@@ -10,8 +10,9 @@ router.get("/", fondoController.getFondos);
 router.get("/:id", fondoController.getFondoById);
 router.post("/", isAdmin, fondoController.createFondo);
 router.put("/:id", isAdmin, fondoController.updateFondo);
-router.put("/:id/concursos", isAdmin, fondoController.updateIdConcurso);
+router.put("/:id/concursos", isAdmin, fondoController.addConcursoId);
 router.put("/:id/montoMaximo", isAdmin, fondoController.updateMontoMaximo);
 router.delete("/:id", isAdmin, fondoController.deleteFondo);
+router.delete("/:id/concursos", isAdmin, fondoController.deleteConcursoId);
 
 export default router;

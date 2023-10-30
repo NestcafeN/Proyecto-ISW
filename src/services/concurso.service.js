@@ -60,6 +60,26 @@ async function createConcurso(concurso) {
   }
 }
 
+async function addPostulacionId(id, postulaciones) {
+  try {
+    const concursoFound = await Concurso.findById(id);
+    if (!concursoFound) {
+      return [null, "Concurso no encontrado"];
+    }
+    const concursoUpdated = await Concurso.findByIdAndUpdate(
+      id,
+      { postulaciones },
+      { new: true }
+    );
+    if (!concursoUpdated) {
+      return [null, "Concurso no encontrado"];
+    }
+    return [concursoUpdated, null];
+  } catch (error) {
+    handleError(error, "concurso.service -> updateIdPostulacion");
+  }
+}
+
 async function updateConcurso(id, concurso) {
   try {
     const concursoFound = await Concurso.findById(id);
@@ -104,10 +124,34 @@ async function deleteConcurso(id) {
   }
 }
 
+async function deletePostulacionId(concursoId, postulacionId) {
+  try {
+    const concursoFound = await Concurso.findById(concursoId);
+    if (!concursoFound) {
+      return [null, "Concurso no encontrado"];
+    }
+
+    // Filtra las postulaciones para excluir la que deseas eliminar
+    const postulacionesupdated = concursoFound.postulaciones.filter(
+      (postulacion) => postulacion.toString() !== postulacionId
+    );
+
+    concursoFound.postulaciones = postulacionesupdated;
+
+    const concursoUpdated = await concursoFound.save();
+
+    return [concursoUpdated, null];
+  } catch (error) {
+    handleError(error, "concurso.service -> deletePostulacionId");
+  }
+}
+
 export const concursoService = {
   getConcursos,
   getConcursoById,
   createConcurso,
+  addPostulacionId,
   updateConcurso,
   deleteConcurso,
+  deletePostulacionId,
 };

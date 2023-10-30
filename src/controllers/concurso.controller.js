@@ -7,7 +7,6 @@ import {
   concursoIdSchema,
 } from "../schemas/concurso.schema.js";
 import { concursoService } from "../services/concurso.service.js";
-import Fondo from "../models/fondo.model.js";
 
 async function getConcursos(req, res) {
   try {
@@ -71,6 +70,29 @@ async function createConcurso(req, res) {
   }
 }
 
+async function addPostulacionId(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = concursoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+    const { id } = params;
+    const { postulaciones } = body;
+    const updatedConcurso = await concursoService.addPostulacionId(
+      id,
+      postulaciones
+    );
+    if (!updatedConcurso) {
+      return respondError(req, res, 400, "No se pudo actualizar el concurso");
+    }
+    respondSuccess(req, res, 200, updatedConcurso);
+  } catch (error) {
+    handleError(error, "concurso.controller -> updateIdPostulacion");
+    respondError(req, res, 500, "No se pudo actualizar el concurso");
+  }
+}
+
 async function updateConcurso(req, res) {
   try {
     const { body, params } = req;
@@ -124,10 +146,47 @@ async function deleteConcurso(req, res) {
   }
 }
 
+async function deletePostulacionId(req, res) {
+  try {
+    const { params } = req;
+    const { error: paramsError } = concursoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+    const { id } = params;
+    const { postulacionId } = req.body;
+
+    const updatedConcurso = await concursoService.deletePostulacionId(
+      id,
+      postulacionId
+    );
+
+    if (!updatedConcurso) {
+      return respondError(
+        req,
+        res,
+        400,
+        "No se pudo eliminar la postulación del concurso"
+      );
+    }
+    respondSuccess(req, res, 200, updatedConcurso);
+  } catch (error) {
+    handleError(error, "concurso.controller -> deletePostulacionId");
+    respondError(
+      req,
+      res,
+      500,
+      "No se pudo eliminar la postulación del concurso"
+    );
+  }
+}
+
 export const concursoController = {
   getConcursos,
   getConcursoById,
   createConcurso,
+  addPostulacionId,
   updateConcurso,
   deleteConcurso,
+  deletePostulacionId,
 };

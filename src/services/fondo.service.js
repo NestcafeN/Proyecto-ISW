@@ -72,7 +72,7 @@ async function createFondo(fondo) {
   }
 }
 
-async function updateIdConcurso(id, concursos) {
+async function addConcursoId(id, concursos) {
   try {
     const fondoFound = await Fondo.findById(id);
     if (!fondoFound) {
@@ -159,12 +159,34 @@ async function deleteFondo(id) {
   }
 }
 
+async function deleteConcursoId(fondoId, concursoId) {
+  try {
+    const fondoFound= await Fondo.findById(fondoId);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
+    }
+
+    const concursosupdated = fondoFound.concursos.filter(
+      (concurso) => concurso.toString() !== concursoId
+    );
+
+    fondoFound.concursos = concursosupdated;
+
+    const fondoUpdated = await fondoFound.save();
+
+    return [fondoUpdated, null];
+  } catch (error) {
+    handleError(error, "fondo.service -> deleteConcursoId");
+  }
+}
+
 export const fondoService = {
   getFondos,
   getFondoById,
   createFondo,
-  updateIdConcurso,
+  addConcursoId,
   updateMontoMaximo,
   updateFondo,
   deleteFondo,
+  deleteConcursoId,
 };

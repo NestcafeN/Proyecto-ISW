@@ -39,6 +39,7 @@ async function createUsers() {
 
     const admin = await Role.findOne({ name: "admin" });
     const user = await Role.findOne({ name: "user" });
+    const evaluador = await Role.findOne({ name: "evaluador"});
 
     await Promise.all([
       new User({

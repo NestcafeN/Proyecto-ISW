@@ -1,11 +1,14 @@
 import express from "express";
+import { isAdmin } from '../middlewares/authorization.middleware.js';
 import { criterioController } from '../controllers/criterio.controller.js';
+import authenticationMiddleware from '../middlewares/authentication.middleware.js';
 const router = express.Router();
+router.use(authenticationMiddleware);
 
-router.get("/", criterioController.getCriterios);
-router.get("/:id", criterioController.getCriterioById);
-router.post("/", criterioController.createCriterio);
-router.put("/:id", criterioController.updateCriterio);
-router.delete("/:id", criterioController.deleteCriterio);
+router.get("/", isAdmin, criterioController.getCriterios);
+router.get("/:id", isAdmin, criterioController.getCriterioById);
+router.post("/", isAdmin, criterioController.createCriterio);
+router.put("/:id", isAdmin, criterioController.updateCriterio);
+router.delete("/:id", isAdmin, criterioController.deleteCriterio);
 
 export default router;

@@ -1,6 +1,5 @@
 "use strict";
 
-
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { ACCESS_JWT_SECRET, REFRESH_JWT_SECRET } from "../config/configEnv.js";

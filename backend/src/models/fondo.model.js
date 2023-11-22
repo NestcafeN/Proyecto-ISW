@@ -40,6 +40,15 @@ const fondoSchema = new Schema(
         },
         message: "La fecha de cierre debe ser posterior a la fecha de apertura",
       },
+      validate: {
+      validator: function (fechaCierre) {
+        // Verificar que la fecha de cierre sea al menos una semana después de la fecha de apertura
+        const unaSemanaDespues = new Date(this.fechaApertura);
+        unaSemanaDespues.setDate(unaSemanaDespues.getDate() + 7);
+        return fechaCierre >= unaSemanaDespues;
+      },
+      message: "La fecha de cierre debe ser al menos una semana después de la fecha de apertura",
+    },
     },
     concursos: [
       {

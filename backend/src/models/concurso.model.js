@@ -7,10 +7,25 @@ const concursoSchema = new Schema(
     nombre: {
       type: String,
       required: true,
-    },
-    descripcion: {
-      type: String,
-      required: true,
+      minlength: 10,
+      maxlength: 150,
+      unique: true,
+      validate: {
+        validator: function (value) {
+          const caracteresPermitidos = /^[a-zA-Z0-9áéíóúÁÉÍÓÚüÜ\s&_-]+$/;
+          const caracteresInvalidos = /[#$%!|¬?¡¿()=><.;,:~*+/{}[\]^`]+/;
+
+          if (
+            !caracteresPermitidos.test(value) ||
+            caracteresInvalidos.test(value)
+          ) {
+            return false;
+          }
+
+          return true;
+        },
+        message: "Formato de nombre no válido",
+      },
     },
     estado: {
       type: String,

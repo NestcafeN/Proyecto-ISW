@@ -149,16 +149,13 @@ async function deleteConcurso(req, res) {
 async function deletePostulacionId(req, res) {
   try {
     const { params } = req;
-    const { error: paramsError } = concursoIdSchema.validate(params);
-    if (paramsError) {
-      return respondError(req, res, 400, paramsError.message);
-    }
-    const { id } = params;
-    const { postulacionId } = req.body;
+    
+    const { idConcurso } = params;
+    const { idPostulacion } = params;
 
     const updatedConcurso = await concursoService.deletePostulacionId(
-      id,
-      postulacionId
+      idConcurso,
+      idPostulacion
     );
 
     if (!updatedConcurso) {
@@ -172,12 +169,7 @@ async function deletePostulacionId(req, res) {
     respondSuccess(req, res, 200, updatedConcurso);
   } catch (error) {
     handleError(error, "concurso.controller -> deletePostulacionId");
-    respondError(
-      req,
-      res,
-      500,
-      "No se pudo eliminar la postulación del concurso"
-    );
+    respondError(req,res,500,"No se pudo eliminar la postulación del concurso");
   }
 }
 

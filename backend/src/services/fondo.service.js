@@ -2,10 +2,15 @@
 
 import { handleError } from "../utils/errorHandler.js";
 import Fondo from "../models/fondo.model.js";
+import Categoria from "../models/categoria.model.js";
+import Concurso from "../models/concurso.model.js";
 
 async function getFondos() {
   try {
-    const fondos = await Fondo.find().populate("concursos").exec();
+    const fondos = await Fondo.find()
+      .populate("concursos")
+      .populate("categoria")
+      .exec();
 
     if (!fondos) {
       return [null, "No hay fondos registrados"];
@@ -18,7 +23,10 @@ async function getFondos() {
 
 async function getFondoById(id) {
   try {
-    const fondo = await Fondo.findById(id);
+    const fondo = await Fondo.findById(id)
+      .populate("concursos")
+      .populate("categoria")
+      .exec();
     if (!fondo) {
       return [null, "Fondo no encontrado"];
     }
@@ -69,6 +77,26 @@ async function createFondo(fondo) {
     } else {
       handleError(error, "fondo.service -> createFondo");
     }
+  }
+}
+async function addCategoriaId(id, categoria) {
+  try {
+    const fondoFound = await Fondo.findById(id);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
+    }
+    const updatedFondo = await Fondo.findByIdAndUpdate(
+      id,
+      { categoria },
+      { new: true }
+    );
+    if (!updatedFondo) {
+      return [null, "Fondo no encontrado"];
+    }
+
+    return [updatedFondo, null];
+  } catch (error) {
+    handleError(error, "fondo.service -> updateFondo");
   }
 }
 
@@ -159,18 +187,21 @@ async function deleteFondo(id) {
   }
 }
 
-async function deleteConcursoId(fondoId, concursoId) {
+async function deleteConcursoId(idFondo, idConcurso) {
   try {
-    const fondoFound= await Fondo.findById(fondoId);
+    const fondoFound = await Fondo.findById(idFondo);
     if (!fondoFound) {
       return [null, "Fondo no encontrado"];
     }
-
-    const concursosupdated = fondoFound.concursos.filter(
-      (concurso) => concurso.toString() !== concursoId
+    const concursoFound = await Concurso.findById(idConcurso);
+    if (!concursoFound) {
+      return [null, "Concurso no encontrado"];
+    }
+    const updatedFondo = await Fondo.findByIdAndUpdate(
+      idFondo,
+      { $pull: { concursos: idConcurso } },
+      { new: true }
     );
-
-    fondoFound.concursos = concursosupdated;
 
     const fondoUpdated = await fondoFound.save();
 
@@ -180,13 +211,40 @@ async function deleteConcursoId(fondoId, concursoId) {
   }
 }
 
+async function deleteCategoriaId(idFondo, idCategoria) {
+  try {
+    const fondoFound = await Fondo.findById(idFondo);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
+    }
+    const categoriaFound = await Categoria.findById(idCategoria);
+    if (!categoriaFound) {
+      return [null, "Categoria no encontrada"];
+    }
+    const updatedFondo = await Fondo.findByIdAndUpdate(
+      idFondo,
+      { $pull: { categoria: idCategoria } },
+      { new: true }
+    );
+    if (!updatedFondo) {
+      return [null, "Fondo no encontrado"];
+    }
+
+    return [updatedFondo, null];
+  } catch (error) {
+    handleError(error, "fondo.service -> deleteCategoriaId");
+  }
+}
+
 export const fondoService = {
   getFondos,
   getFondoById,
   createFondo,
+  addCategoriaId,
   addConcursoId,
   updateMontoMaximo,
   updateFondo,
   deleteFondo,
   deleteConcursoId,
+  deleteCategoriaId,
 };

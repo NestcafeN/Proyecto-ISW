@@ -8,11 +8,6 @@ const concursoBodySchema = Joi.object({
     "any.required": "El nombre del concurso es obligatorio",
     "string base": "El nombre del concurso debe ser de tipo string",
   }),
-  descripcion: Joi.string().required().messages({
-    "string.empty": "La descripcion del concurso no puede estar vacia",
-    "any.required": "La descripcion del concurso es obligatoria",
-    "string base": "La descripcion del concurso debe ser de tipo string",
-  }),
   estado: Joi.string().required().messages({
     "string.empty": "El estado del concurso no puede estar vacio",
     "any.required": "El estado del concurso es obligatorio",

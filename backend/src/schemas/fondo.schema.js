@@ -13,10 +13,10 @@ const fondoBodySchema = Joi.object({
     "any.required": "La descripcion del fondo es obligatoria",
     "string base": "La descripcion del fondo debe ser de tipo string",
   }),
-  categoria: Joi.string().required().messages({
-    "string.empty": "La categoria del fondo no puede estar vacio",
-    "any.required": "La categoria del fondo es obligatorio",
-    "string base": "La categoria del fondo debe ser de tipo string",
+  categoria: Joi.array().required().messages({
+    "string.empty": "El id de la categoria no puede estar vacia",
+    "any.required": "El id de la categoria es obligatorio",
+    "array base": "El id de la categoria del fondo debe ser de tipo string",
   }),
   montoMax: Joi.number().required().messages({
     "number.empty": "El montoMax del fondo no puede estar vacio",

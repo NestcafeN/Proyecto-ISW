@@ -65,6 +65,26 @@ async function createFondo(req, res) {
     respondError(req, res, 500, "No se pudo crear el fondo");
   }
 }
+async function addCategoriaId(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = fondoIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+
+    const { id } = params;
+    const { categoria } = body;
+    const updatedFondo = await fondoService.addCategoriaId(id, categoria);
+    if (!updatedFondo) {
+      return respondError(req, res, 404, "Fondo no encontrado");
+    }
+    respondSuccess(req, res, 200, updatedFondo);
+  } catch (error) {
+    handleError(error, "fondo.controller -> updateIdCategoria");
+    respondError(req, res, 500, "No se pudo actualizar el id de la categoria");
+  }
+}
 
 async function addConcursoId(req, res) {
   try {
@@ -162,16 +182,13 @@ async function deleteFondo(req, res) {
 
 async function deleteConcursoId(req, res) {
   try {
-    const { params } = req;
-    const { error: paramsError } = fondoIdSchema.validate(params);
-    if (paramsError) {
-      return respondError(req, res, 400, paramsError.message);
-    }
+    const { idFondo } = req.params;
+    const { idConcurso } = req.params;
 
-    const { id } = params;
-    const { concursoId } = req.body;
-
-    const updatedFondo = await fondoService.deleteConcursoId(id, concursoId);
+    const updatedFondo = await fondoService.deleteConcursoId(
+      idFondo,
+      idConcurso
+    );
 
     if (!updatedFondo) {
       return respondError(
@@ -188,13 +205,39 @@ async function deleteConcursoId(req, res) {
   }
 }
 
+async function deleteCategoriaId(req, res) {
+  try {
+    const { idFondo } = req.params;
+    const { idCategoria } = req.params;
+    const updatedFondo = await fondoService.deleteCategoriaId(
+      idFondo,
+      idCategoria
+    );
+
+    if (!updatedFondo) {
+      return respondError(
+        req,
+        res,
+        404,
+        "No se pudo eliminar la categoria del Fondo"
+      );
+    }
+    respondSuccess(req, res, 200, updatedFondo);
+  } catch (error) {
+    handleError(error, "fondo.controller -> deleteCategoriaId");
+    respondError(req, res, 500, "No se pudo eliminar la categoria del fondo");
+  }
+}
+
 export const fondoController = {
   getFondos,
   getFondoById,
   createFondo,
+  addCategoriaId,
   addConcursoId,
   updateMontoMaximo,
   updateFondo,
   deleteFondo,
   deleteConcursoId,
+  deleteCategoriaId,
 };

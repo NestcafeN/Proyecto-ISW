@@ -2,6 +2,7 @@
 
 import { handleError } from "../utils/errorHandler.js";
 import Concurso from "../models/concurso.model.js";
+import Postulacion from "../models/postulacion.model.js";
 
 async function getConcursos() {
   try {
@@ -18,7 +19,9 @@ async function getConcursos() {
 
 async function getConcursoById(id) {
   try {
-    const concurso = await Concurso.findById(id);
+    const concurso = await Concurso.findById(id)
+      .populate("postulaciones")
+      .exec();
     if (!concurso) {
       return [null, "Concurso no encontrado"];
     }
@@ -32,7 +35,6 @@ async function createConcurso(concurso) {
   try {
     const {
       nombre,
-      descripcion,
       estado,
       postulaciones,
       fechaAperturaConcurso,
@@ -46,7 +48,6 @@ async function createConcurso(concurso) {
     }
     const newConcurso = new Concurso({
       nombre,
-      descripcion,
       estado,
       postulaciones,
       fechaAperturaConcurso,
@@ -88,7 +89,6 @@ async function updateConcurso(id, concurso) {
     }
     const {
       nombre,
-      descripcion,
       estado,
       postulaciones,
       fechaAperturaConcurso,
@@ -99,7 +99,6 @@ async function updateConcurso(id, concurso) {
       id,
       {
         nombre,
-        descripcion,
         estado,
         postulaciones,
         fechaAperturaConcurso,
@@ -124,23 +123,28 @@ async function deleteConcurso(id) {
   }
 }
 
-async function deletePostulacionId(concursoId, postulacionId) {
+async function deletePostulacionId(idConcurso, idPostulacion) {
   try {
-    const concursoFound = await Concurso.findById(concursoId);
+    const concursoFound = await Concurso.findById(idConcurso);
     if (!concursoFound) {
       return [null, "Concurso no encontrado"];
     }
 
-    // Filtra las postulaciones para excluir la que deseas eliminar
-    const postulacionesupdated = concursoFound.postulaciones.filter(
-      (postulacion) => postulacion.toString() !== postulacionId
+    const postulacionFound = await Postulacion.findById(idPostulacion);
+    if (!postulacionFound) {
+      return [null, "Postulacion no encontrada"];
+    }
+
+    const updatedConcurso = await Concurso.findByIdAndUpdate(
+      idConcurso,
+      { $pull: { postulaciones: idPostulacion } },
+      { new: true }
     );
+    if (!updatedConcurso) {
+      return [null, "Concurso no encontrado"];
+    }
 
-    concursoFound.postulaciones = postulacionesupdated;
-
-    const concursoUpdated = await concursoFound.save();
-
-    return [concursoUpdated, null];
+    return [updatedConcurso, null];
   } catch (error) {
     handleError(error, "concurso.service -> deletePostulacionId");
   }

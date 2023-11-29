@@ -1,75 +1,143 @@
-import {Postulacion} from '../models/postulacion.model.js';
+"use strict";
 
-export async function getPostulaciones(req, res) {
-    try {
-          const postulaciones = await postulaciones.find();
-          res.status(200).json({ postulaciones });
-    } catch (error) {
-          res.status(500).json({ message: "Error al obtener las postulaciones ingresadas" });
+import { handleError } from "../utils/errorHandler.js";
+import { respondSuccess, respondError } from "../utils/resHandler.js";
+import { postulacionBodySchema, postulacionIdSchema } from "../schemas/postulacion.schema.js";
+import { postulacionService } from "../services/postulacion.service.js";
+
+async function getPostulaciones(req, res) {
+  try {
+    const [postulaciones, errorPostulaciones] = await postulacionService.getPostulaciones();
+    if (errorPostulaciones) {
+      return respondError(req, res, 404, errorPostulaciones);
     }
+    postulaciones.length === 0
+      ? respondSuccess(req, res, 204)
+      : respondSuccess(req, res, 200, postulaciones);
+  } catch (error) {
+    handleError(error, "postulacion.controller -> getPostulaciones");
+    respondError(req, res, 400, error.message);
+  }
 }
 
-export async function getPostulacion(req, res) {
-    try {
-          const postulacion = await Postulacion.findById(req.params.id);
-          if (!postulacion) {
-                return res.status(404).json({ message: "Postulaciòn no encontrada"});
-          }
-          res.status(200).json({ Postulacion });
-    } catch (error) { 
-          res.status(500).json({ message: "Error al obtener la postulacion" });
+async function getPostulacionById(req, res) {
+  try {
+    const { params } = req;
+    const { error: paramsError } = postulacionIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
     }
+
+    const [postulacion, errorPostulacion] = await postulacionService.getPostulacionById(params.id);
+    if (errorPostulacion) {
+      return respondError(req, res, 404, errorPostulacion);
+    }
+    respondSuccess(req, res, 200, postulacion);
+  } catch (error) {
+    handleError(error, "postulacion.controller -> getPostulacionById");
+    respondError(req, res, 500, "No se pudo obtener la postulación");
+  }
 }
 
-export async function createPostulacion(req, res) {
-    try {
-          const postulacion = new Postulacion({
-                nombreCompleto: req.body.nombreCompleto,
-                rut: req.body.rut,
-                correo:req.body.correo,
-                direccion: req.body.direccion,
-                proyecto: req.body.proyecto,
-                estado: req.body.estado,
-                fechaPostulacion: req.body.fechaPostulacion,
-          });
-          const nuevaPostulacion = await postulacion.save();
-          res.status(201).json(nuevaPostulacion);
-    } catch (error) {
-      console.log(error)
-          res.status(400).json({ message: "Error al crear postulacion" });
+async function createPostulacion(req, res) {
+  try {
+    const { body } = req;
+    const { error: bodyError } = postulacionBodySchema.validate(body);
+    if (bodyError) {
+      return respondError(req, res, 400, bodyError.message);
     }
+    const [newPostulacion, errorPostulacion] = await postulacionService.createPostulacion(body);
+    if (errorPostulacion) {
+      return respondError(req, res, 400, errorPostulacion);
+    }
+    if (newPostulacion) {
+      return respondSuccess(req, res, 201, newPostulacion);
+    } else {
+      return respondError(req, res, 400, "No se pudo crear la postulación");
+    }
+  } catch (error) {
+    handleError(error, "postulacion.controller -> createPostulacion");
+    respondError(req, res, 500, "No se pudo crear la postulación");
+  }
 }
 
-export async function updatePostulacion(req, res) {
-    try {
-          const postulacion = await Postulacion.findById(req.params.id);
-                if (!Postulacion) {
-                      return res.status(404).json({ message: "Postulacion no encontrada"});
-                }
-                postulacion.nombreCompleto= req.body.nombreCompleto,
-                postulacion.rut= req.body.rut,
-                postulacion.direccion= req.body.direccion,
-                postulacion.proyecto= req.body.proyecto,
-                postulacion.estado= req.body.estado,
-                postulacion.fechaPostulacion= req.body.fechaPostulacion
-
-                const postulacionActualizada = await postulacion.save();
-                      res.status(200).json(concursoActualizado);
-    } catch (error) {
-          res.status(400).json({message: "Error al actualizar postulaciòn"})
+async function updatePostulacion(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = postulacionIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
     }
+
+    const { id } = params;
+    const { nombreCompleto, rut, correo, direccion, proyecto, fechaPostulacion } = body;
+    const updatedPostulacion = await postulacionService.updatePostulacion(id, {
+      nombreCompleto,
+      rut,
+      correo,
+      direccion,
+      proyecto,
+      fechaPostulacion,
+    });
+
+    if (!updatedPostulacion) {
+      return respondError(req, res, 404, "Postulación no encontrada");
+    }
+    respondSuccess(req, res, 200, updatedPostulacion);
+  } catch (error) {
+    handleError(error, "postulacion.controller -> updatePostulacion");
+    respondError(req, res, 500, "No se pudo actualizar la postulación");
+  }
 }
 
-export async function deletePostulacion(req, res) {
-    try {
-          const postulacion = await Postulacion.findById(req.params.id);
-
-          if (!postulacion) {
-                return res.status(404).json({ message: "Postulaciòn no encontrado"});
-          }
-          await postulacion.remove();
-          res.status(200).json({ message: "Postulaciòn eliminado correctamente"});
-    } catch (error) {
-          res.status(400).json({message: "Error al eliminar postulaciòn"})
+async function deletePostulacion(req, res) {
+  try {
+    const { params } = req;
+    const { error: paramsError } = postulacionIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
     }
+
+    const deletedPostulacion = await postulacionService.deletePostulacion(params.id);
+    if (!deletedPostulacion) {
+      return respondError(req, res, 404, "Postulación no encontrada");
+    }
+    respondSuccess(req, res, 200, deletedPostulacion);
+  } catch (error) {
+    handleError(error, "postulacion.controller -> deletePostulacion");
+    respondError(req, res, 500, "No se pudo eliminar la postulación");
+  }
 }
+
+async function updateEstadoPostulacion(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = postulacionIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+
+    const { id } = params;
+    const { estado } = body;
+
+    const updatedPostulacion = await postulacionService.updateEstadoPostulacion(id, estado);
+
+    if (!updatedPostulacion) {
+      return respondError(req, res, 404, "Postulación no encontrada");
+    }
+
+    respondSuccess(req, res, 200, updatedPostulacion);
+  } catch (error) {
+    handleError(error, "postulacion.controller -> updateEstadoPostulacion");
+    respondError(req, res, 500, "No se pudo actualizar el estado de la postulación");
+  }
+}
+
+export {
+  getPostulaciones,
+  getPostulacionById,
+  createPostulacion,
+  updatePostulacion,
+  deletePostulacion,
+  updateEstadoPostulacion,
+};

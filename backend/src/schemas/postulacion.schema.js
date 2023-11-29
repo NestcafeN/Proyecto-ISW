@@ -8,6 +8,8 @@ const postulacionBodySchema = Joi.object({
     "string.empty": "El nombre completo no puede estar vacío.",
     "any.required": "El nombre completo es obligatorio.",
     "string.base": "El nombre completo debe ser de tipo string.",
+    "string.pattern.base": "El nombre completo no puede contener solo espacios en blanco.",
+    "string.max": "El nombre completo debe tener como máximo 30 caracteres.",
   }),
   rut: Joi.string()
     .required()
@@ -37,11 +39,22 @@ const postulacionBodySchema = Joi.object({
     "any.required": "El nombre del proyecto es obligatorio.",
     "string.base": "El nombre del proyecto debe ser de tipo string.",
   }),
-  estado: Joi.string()
-    .valid("R", "r", "A", "a", "E", "e")
+  documentos: Joi.array()
+  .items(Joi.binary()
+    .encoding("base64")
+    .min(1)
     .required()
     .messages({
-      "any.only": "El estado debe ser 'R', 'A' o 'E' en mayúsculas o minúsculas.",
+      "binary.base": "El documento debe ser de tipo binario.",
+      "binary.min": "Debe adjuntar al menos un documento.",
+      "any.required": "Los documentos son obligatorios.",
+    })
+  ),
+  estado: Joi.string().default("ER")
+    .valid("R", "r", "A", "a", "ER", "er", "eR", "Er", "er")
+    .required()
+    .messages({
+      "any.only": "El estado debe ser 'R', 'A' o 'ER' en mayúsculas o minúsculas.",
       "any.required": "El estado es obligatorio.",
       "string.base": "El estado debe ser de tipo string.",
     }),

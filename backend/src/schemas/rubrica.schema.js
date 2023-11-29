@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import { criterioBodySchema } from './criterio.schema.js';
 
 const rubricaBodySchema = Joi.object({
   nombre: Joi.string().trim().required().messages({
@@ -12,14 +11,11 @@ const rubricaBodySchema = Joi.object({
     "any.required": "El tipo de fondo de la rúbrica es obligatorio",
     "string.base": "El tipo de fondo de la rúbrica debe ser de tipo string",
   }),
-  criterios: Joi.array()
-    .min(1)
-    .items(criterioBodySchema)
-    .unique((a, b) => a.nombre === b.nombre)
-    .messages({
-      "array.unique": "No pueden existir criterios con el mismo nombre en una rúbrica",
-      "array.min": "Debe existir al menos un criterio",
-    }),
+  criterios: Joi.array().required().messages({
+    "array.empty": "El id del criterio no puede estar vacio",
+    "any.required": "El id del criterio es obligatorio",
+    "array base": "El id del criterio debe ser de tipo string",
+  }),
   puntajeMinimoAprobacion: Joi.number().required().messages({
     "number.base": "El puntaje mínimo de aprobación debe ser de tipo numérico",
     "any.required": "El puntaje mínimo de aprobación es obligatorio",

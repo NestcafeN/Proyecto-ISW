@@ -1,4 +1,5 @@
 import { rubricaService } from '../services/rubrica.service.js';
+import { criterioService } from '../services/criterio.service.js';
 import { rubricaBodySchema, rubricaIdSchema } from '../schemas/rubrica.schema.js';
 import { handleError } from '../utils/errorHandler.js';
 import { respondSuccess, respondError } from '../utils/resHandler.js';

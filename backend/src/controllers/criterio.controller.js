@@ -1,4 +1,3 @@
-import { Criterio } from '../models/criterio.model.js';
 import { handleError } from '../utils/errorHandler.js';
 import { respondSuccess, respondError } from '../utils/resHandler.js';
 import { criterioBodySchema, criterioIdSchema } from '../schemas/criterio.schema.js';

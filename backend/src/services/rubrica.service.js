@@ -1,7 +1,10 @@
 "use strict";
 
+import { ObjectId } from 'mongoose';
 import { handleError } from "../utils/errorHandler.js";
 import Rubrica from "../models/rubrica.model.js";
+import { criterioService } from './criterio.service.js';
+const { getCriterioById } = criterioService;
 
 async function getRubricas() {
     try {

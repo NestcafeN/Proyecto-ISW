@@ -50,8 +50,8 @@ const postulacionBodySchema = Joi.object({
       "any.required": "Los documentos son obligatorios.",
     })
   ),
-  estado: Joi.string().default("ER")
-    .valid("R", "r", "A", "a", "ER", "er", "eR", "Er", "er")
+  estado: Joi.string().default("EN REVISION")
+    .valid("RECHAZADO", "ACEPTADO", "EN REVISION")
     .required()
     .messages({
       "any.only": "El estado debe ser 'R', 'A' o 'ER' en mayúsculas o minúsculas.",

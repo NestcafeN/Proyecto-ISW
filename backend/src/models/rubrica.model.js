@@ -77,6 +77,7 @@ const rubricaSchema = new Schema({
             message: "El puntaje máximo de aprobación no puede ser menor que el puntaje mínimo de aprobación",
         },
     },
+    puntajeTotal: { type: Number, default: 0 },
     fechaCreacion: {
         type: Date,
         default: Date.now,

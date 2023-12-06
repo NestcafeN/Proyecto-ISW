@@ -1,14 +1,14 @@
 "use strict";
 
-import { ObjectId } from 'mongoose';
 import { handleError } from "../utils/errorHandler.js";
 import Rubrica from "../models/rubrica.model.js";
+import Criterio from "../models/criterio.model.js";
 import { criterioService } from './criterio.service.js';
 const { getCriterioById } = criterioService;
 
 async function getRubricas() {
     try {
-        const rubricas = await Rubrica.find();
+      const rubricas = await Rubrica.find().populate('criterios');
 
         if (!rubricas || rubricas.length === 0) {
             return [[], "No hay rubricas registradas"];
@@ -21,7 +21,7 @@ async function getRubricas() {
 
 async function getRubricaById(id) {
     try {
-        const rubrica = await Rubrica.findById(id);
+      const rubrica = await Rubrica.findById(id).populate('criterios');
         if (!rubrica) {
             return [null, "Rubrica no encontrada"];
         }
@@ -104,10 +104,57 @@ async function deleteRubrica(id) {
     }
   }
 
+async function addCriterioById(id, criterios) {
+  try {
+    const rubricaFound = await Rubrica.findById(id);
+    if (!rubricaFound) {
+      return [null, "Rubrica no encontrada"];
+    }
+    const updatedRubrica = await Rubrica.findByIdAndUpdate(
+      id,
+      { criterios },
+      { new: true }
+    );
+    if (!updatedRubrica) {
+      return [null, "Rubrica no encontrada"];
+    }
+
+    return [updatedRubrica, null];
+  } catch (error) {
+    handleError(error, "rubrica.service -> updateRubrica");
+  }
+}
+
+async function deleteCriterioById(RubricaID, CriterioID) {
+    try {
+      const rubricaFound = await Rubrica.findById(RubricaID);
+      if (!rubricaFound) {
+        return [null, "Rubrica no encontrada"];
+      }
+      const criterioFound = await Criterio.findById(CriterioID);
+      if (!criterioFound) {
+        return [null, "Criterio no encontrado"];
+      }
+      const updatedRubrica = await Rubrica.findByIdAndUpdate(
+        RubricaID,
+        { $pull: { criterios: CriterioID } },
+        { new: true }
+      );
+
+      const rubricaUpdated = await rubricaFound.save();
+
+      return [rubricaUpdated, null];
+    } catch (error) {
+      handleError(error, "rubrica.service -> deleteCriterioById");
+    }
+  }
+
 export const rubricaService = {
     getRubricas,
     getRubricaById,
     createRubrica,
     updateRubrica,
     deleteRubrica,
+    addCriterioById,
+    deleteCriterioById,
 };

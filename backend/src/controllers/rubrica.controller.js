@@ -123,10 +123,58 @@ export async function deleteRubrica(req, res) {
   }
 }
 
+async function addCriterioById(req, res) {
+  try {
+    const { body, params } = req;
+    const { error: paramsError } = rubricaIdSchema.validate(params);
+    if (paramsError) {
+      return respondError(req, res, 400, paramsError.message);
+    }
+
+    const { id } = params;
+    const { criterios } = body;
+    const updatedRubrica = await rubricaService.addCriterioById(id, criterios);
+    if (!updatedRubrica) {
+      return respondError(req, res, 404, "Fondo no encontrado");
+    }
+    respondSuccess(req, res, 200, updatedRubrica);
+  } catch (error) {
+    handleError(error, "rubrica.controller -> updateIdCriterio");
+    respondError(req, res, 500, "No se pudo actualizar el id del criterio");
+  }
+}
+
+async function deleteCriterioById(req, res) {
+  try {
+    const { RubricaID } = req.params;
+    const { CriterioID } = req.params;
+
+    const updatedRubrica = await rubricaService.deleteCriterioById(
+      RubricaID,
+      CriterioID
+    );
+
+    if (!updatedRubrica) {
+      return respondError(
+        req,
+        res,
+        404,
+        "No se pudo eliminar el criterio de la Rubrica"
+      );
+    }
+    respondSuccess(req, res, 200, updatedRubrica);
+  } catch (error) {
+    handleError(error, "rubrica.controller -> deleteCriterioById");
+    respondError(req, res, 500, "No se pudo eliminar el criterio de la Rubrica");
+  }
+}
+
 export const rubricaController = {
   getRubricas,
   getRubricaById,
   createRubrica,
   updateRubrica,
   deleteRubrica,
+  addCriterioById,
+  deleteCriterioById,
 };

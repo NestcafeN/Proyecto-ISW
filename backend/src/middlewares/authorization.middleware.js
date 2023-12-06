@@ -32,4 +32,25 @@ async function isAdmin(req, res, next) {
   }
 }
 
-export { isAdmin };
+async function isEvaluador(req, res, next) {
+  try {
+    const user = await User.findOne({ email: req.email });
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    for (let i = 0; i < roles.length; i++) {
+      if (roles[i].name === "evaluador") {
+        next();
+        return;
+      }
+    }
+    return respondError(
+      req,
+      res,
+      401,
+      "Se requiere un rol de evaluador para realizar esta acción"
+    );
+  } catch (error) {
+    handleError(error, "authorization.middleware -> isEvaluador");
+  }
+}
+
+export { isAdmin, isEvaluador };

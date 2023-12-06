@@ -20,4 +20,21 @@ const roleSchema = new Schema(
 
 // Crea el modelo de datos 'Role' a partir del esquema 'roleSchema'
 export const Role = mongoose.model("Role", roleSchema);
+
+const crearRolEvaluador = async () => {
+  try {
+    const evaluadorRoleExistente = await Role.findOne({ name: 'evaluador' });
+
+    if (!evaluadorRoleExistente) {
+      const evaluadorRole = new Role({ name: 'evaluador' });
+      await evaluadorRole.save();
+    }
+  } catch (error) {
+    console.error('Error al crear el rol "Evaluador"', error);
+  }
+};
+
+// Crear el rol "Evaluador" al definir el modelo
+crearRolEvaluador();
+
 export default Role;

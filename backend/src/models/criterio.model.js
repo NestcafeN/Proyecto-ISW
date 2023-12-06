@@ -18,7 +18,7 @@ const criterioSchema = new Schema({
                 validator: function (value) {
                     const caracteresPermitidos = /^[a-zA-Z0-9áéíóúÁÉÍÓÚüÜ\s&()$-]+$/;
                     const caracteresInvalidos = /[^a-zA-Z0-9áéíóúÁÉÍÓÚüÜ\s&()$-]/;
-    
+
                     return caracteresPermitidos.test(value) && !caracteresInvalidos.test(value);
                 },
                 message: "Formato de nombre no válido",

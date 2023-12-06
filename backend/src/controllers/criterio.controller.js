@@ -121,10 +121,37 @@ export async function deleteCriterio(req, res) {
     }
 }
 
+async function updatePuntaje(req, res) {
+    try {
+      const { body, params } = req;
+      const { error: paramsError } = criterioIdSchema.validate(params);
+      if (paramsError) {
+        return respondError(req, res, 400, paramsError.message);
+      }
+      const { id } = params;
+      const { puntaje } = body;
+      const updatedCriterio = await criterioService.updatePuntaje(id, puntaje);
+
+      if (!updatedCriterio) {
+        return respondError(req, res, 404, "Criterio no encontrado");
+      }
+      respondSuccess(req, res, 200, updatedCriterio);
+    } catch (error) {
+      handleError(error, "criterio.controller -> updatePuntaje");
+      respondError(
+        req,
+        res,
+        500,
+        "No se pudo actualizar el puntaje del criterio"
+      );
+    }
+  }
+
 export const criterioController = {
     getCriterios,
     getCriterioById,
     createCriterio,
     updateCriterio,
     deleteCriterio,
+    updatePuntaje,
 };

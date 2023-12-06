@@ -88,10 +88,33 @@ async function deleteCriterio(id) {
     }
 }
 
+async function updatePuntaje(id, puntaje) {
+    try {
+      const criterioFound = await Criterio.findById(id);
+      if (!criterioFound) {
+        return [null, "Criterio no encontrado"];
+      }
+      const updatedCriterio = await Criterio.findByIdAndUpdate(
+        id,
+        { puntaje: puntaje },
+        { new: true }
+      );
+
+      if (!updatedCriterio) {
+        return [null, "Criterio no encontrado"];
+      }
+
+      return [updatedCriterio, null];
+    } catch (error) {
+      handleError(error, "criterio.service -> updateCriterio");
+    }
+  }
+
 export const criterioService = {
     getCriterios,
     getCriterioById,
     createCriterio,
     updateCriterio,
     deleteCriterio,
+    updatePuntaje,
 };

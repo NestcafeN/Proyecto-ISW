@@ -1,7 +1,7 @@
 import LoginForm from '../components/LoginForm';
 import { useNavigate } from 'react-router-dom';
 
-function Login() {
+function Login () {
   const navigate = useNavigate();
 
   if (localStorage.getItem('user')) {
@@ -14,10 +14,12 @@ function Login() {
   }
 
   return (
+      <>
     <div>
-      <h2>Inicia sesion!</h2>
-      <LoginForm />
+      <LoginForm/>
+      
     </div>
+    </>
   );
 }
 

@@ -1,10 +1,14 @@
 import ReactDOM from 'react-dom/client';
-import App from './routes/App.jsx';
-import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './routes/Root.jsx';
 import ErrorPage from './routes/ErrorPage.jsx';
 import Login from './routes/Login.jsx';
+import FondosPage from './routes/FondosPage.jsx';
+import FondosCreatePage from './routes/FondosCreatePage.jsx'
+import ConcursosCreatePage from './routes/ConcursosCreatePage.jsx'
+import { ChakraProvider } from '@chakra-ui/react'
+
+
 
 const router = createBrowserRouter([
   {
@@ -14,7 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <App />,
+        element: <FondosPage />,
       },
     ],
   },
@@ -22,8 +26,18 @@ const router = createBrowserRouter([
     path: '/auth',
     element: <Login />,
   },
+  {
+    path: '/fondos/create',
+    element: <FondosCreatePage />,
+  },
+  {
+    path: '/concursos/create',
+    element: <ConcursosCreatePage />,
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+  <ChakraProvider>
   <RouterProvider router={router} />
+  </ChakraProvider>
 );

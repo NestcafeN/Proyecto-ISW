@@ -1,7 +1,9 @@
 import { Outlet } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../services/auth.service';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Button, Text } from '@chakra-ui/react';
+import { logout } from '../services/auth.service';
+
 
 function Root() {
   return (
@@ -13,23 +15,25 @@ function Root() {
 
 function PageRoot() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleLogout = () => {
     logout();
     navigate('/auth');
   };
 
-  const { user } = useAuth();
-
   return (
+    <>
     <div>
-      <div>
-        <h1>Aqui deberia ir un header</h1>
-        <p>Estas logeado como: {user.email}</p>
-        <button onClick={handleLogout}>Cerrar sesion</button>
-      </div>
+    {user ? (
+          <Text>Estás logueado como: {user.email}</Text>
+        ) : (
+          <Text>Usuario no autenticado</Text>
+        )}
+        <Button onClick={handleLogout}>Cerrar sesion</Button>
+        </div>
       <Outlet />
-    </div>
+    </>
   );
 }
 

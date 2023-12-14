@@ -85,12 +85,6 @@ const fondoSchema = new Schema(
           "La fecha de cierre debe ser al menos una semana después de la fecha de apertura",
       },
     },
-    concursos: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Concurso",
-      },
-    ],
   },
   {
     versionKey: false,

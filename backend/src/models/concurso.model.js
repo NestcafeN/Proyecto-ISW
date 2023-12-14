@@ -34,12 +34,6 @@ const concursoSchema = new Schema(
       message:
         "El estado del concurso debe ser Abierto, Cerrado, En revisión o Finalizado",
     },
-    postulaciones: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Postulacion",
-      },
-    ],
     fechaAperturaConcurso: {
       type: Date,
       required: true,
@@ -82,6 +76,11 @@ const concursoSchema = new Schema(
         },
       ],
     },
+    fondo: [{
+      type: Schema.Types.ObjectId,
+      ref: "Fondo",
+    },
+  ],
   },
   {
     versionKey: false,

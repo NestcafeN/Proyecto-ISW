@@ -10,8 +10,9 @@ router.get("/", concursoController.getConcursos);
 router.get("/:id", concursoController.getConcursoById);
 router.post("/", isAdmin, concursoController.createConcurso);
 router.put("/:id", isAdmin, concursoController.updateConcurso);
-router.put("/:id/postulacion/", isAdmin, concursoController.addPostulacionId)
+router.put("/:id/fondo", isAdmin, concursoController.addFondoId);
 router.delete("/:id", isAdmin, concursoController.deleteConcurso);
-router.delete("/:idConcurso/postulacion/:idPostulacion", isAdmin, concursoController.deletePostulacionId);
+router.delete("/:idConcurso/fondo/:idFondo", isAdmin, concursoController.deleteFondoId); 
+
 
 export default router;

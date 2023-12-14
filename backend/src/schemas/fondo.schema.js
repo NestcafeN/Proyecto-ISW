@@ -33,11 +33,6 @@ const fondoBodySchema = Joi.object({
     "any.required": "La fecha de cierre del fondo es obligatoria",
     "date base": "La fecha de cierre del fondo debe ser de tipo date",
   }),
-  concursos: Joi.array().required().messages({
-    "array.empty": "El id del concurso no puede estar vacio",
-    "any.required": "El id del concurso es obligatorio",
-    "array base": "El id del concurso debe ser de tipo string",
-  }),
 });
 
 const fondoIdSchema = Joi.object({

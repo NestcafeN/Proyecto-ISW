@@ -8,7 +8,6 @@ import Concurso from "../models/concurso.model.js";
 async function getFondos() {
   try {
     const fondos = await Fondo.find()
-      .populate("concursos")
       .populate("categoria")
       .exec();
 
@@ -24,7 +23,6 @@ async function getFondos() {
 async function getFondoById(id) {
   try {
     const fondo = await Fondo.findById(id)
-      .populate("concursos")
       .populate("categoria")
       .exec();
     if (!fondo) {
@@ -45,7 +43,6 @@ async function createFondo(fondo) {
       montoMax,
       fechaApertura,
       fechaCierre,
-      concursos,
     } = fondo;
 
     const fondoFound = await Fondo.findOne({ nombre });
@@ -59,7 +56,6 @@ async function createFondo(fondo) {
       montoMax,
       fechaApertura,
       fechaCierre,
-      concursos,
     });
     await newFondo.validate();
     await newFondo.save();
@@ -100,26 +96,6 @@ async function addCategoriaId(id, categoria) {
   }
 }
 
-async function addConcursoId(id, concursos) {
-  try {
-    const fondoFound = await Fondo.findById(id);
-    if (!fondoFound) {
-      return [null, "Fondo no encontrado"];
-    }
-    const updatedFondo = await Fondo.findByIdAndUpdate(
-      id,
-      { concursos },
-      { new: true }
-    );
-    if (!updatedFondo) {
-      return [null, "Fondo no encontrado"];
-    }
-
-    return [updatedFondo, null];
-  } catch (error) {
-    handleError(error, "fondo.service -> updateFondo");
-  }
-}
 
 async function updateMontoMaximo(id, montoMaximo) {
   try {
@@ -156,7 +132,6 @@ async function updateFondo(id, fondo) {
       montoMax,
       fechaApertura,
       fechaCierre,
-      concursos,
     } = fondo;
     const fondoUpdated = await Fondo.findByIdAndUpdate(
       id,
@@ -167,7 +142,6 @@ async function updateFondo(id, fondo) {
         montoMax,
         fechaApertura,
         fechaCierre,
-        concursos,
       },
       {
         new: true,
@@ -187,29 +161,6 @@ async function deleteFondo(id) {
   }
 }
 
-async function deleteConcursoId(idFondo, idConcurso) {
-  try {
-    const fondoFound = await Fondo.findById(idFondo);
-    if (!fondoFound) {
-      return [null, "Fondo no encontrado"];
-    }
-    const concursoFound = await Concurso.findById(idConcurso);
-    if (!concursoFound) {
-      return [null, "Concurso no encontrado"];
-    }
-    const updatedFondo = await Fondo.findByIdAndUpdate(
-      idFondo,
-      { $pull: { concursos: idConcurso } },
-      { new: true }
-    );
-
-    const fondoUpdated = await fondoFound.save();
-
-    return [fondoUpdated, null];
-  } catch (error) {
-    handleError(error, "fondo.service -> deleteConcursoId");
-  }
-}
 
 async function deleteCategoriaId(idFondo, idCategoria) {
   try {
@@ -241,10 +192,8 @@ export const fondoService = {
   getFondoById,
   createFondo,
   addCategoriaId,
-  addConcursoId,
   updateMontoMaximo,
   updateFondo,
   deleteFondo,
-  deleteConcursoId,
   deleteCategoriaId,
 };

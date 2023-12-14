@@ -36,6 +36,11 @@ const concursoBodySchema = Joi.object({
     "date base":
       "La fecha de anuncio de los ganadores del concurso debe ser de tipo date",
   }),
+  fondo: Joi.array().required().messages({
+    "array.empty": "El id del fondo no puede estar vacio",
+    "any.required": "El id del fondo es obligatorio",
+    "array base": "El id del fondo debe ser de tipo string",
+  }),
 });
 
 const concursoIdSchema = Joi.object({

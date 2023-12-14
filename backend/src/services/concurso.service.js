@@ -2,7 +2,7 @@
 
 import { handleError } from "../utils/errorHandler.js";
 import Concurso from "../models/concurso.model.js";
-import Postulacion from "../models/postulacion.model.js";
+import Fondo from "../models/fondo.model.js";
 
 async function getConcursos() {
   try {
@@ -37,6 +37,7 @@ async function createConcurso(concurso) {
       nombre,
       estado,
       postulaciones,
+      fondo,
       fechaAperturaConcurso,
       fechaCierreConcurso,
       fechaAnuncioGanadores,
@@ -50,6 +51,7 @@ async function createConcurso(concurso) {
       nombre,
       estado,
       postulaciones,
+      fondo,
       fechaAperturaConcurso,
       fechaCierreConcurso,
       fechaAnuncioGanadores,
@@ -61,23 +63,24 @@ async function createConcurso(concurso) {
   }
 }
 
-async function addPostulacionId(id, postulaciones) {
+async function addFondoId(id, fondo) {
   try {
     const concursoFound = await Concurso.findById(id);
     if (!concursoFound) {
       return [null, "Concurso no encontrado"];
     }
-    const concursoUpdated = await Concurso.findByIdAndUpdate(
+    const updatedConcurso = await Concurso.findByIdAndUpdate(
       id,
-      { postulaciones },
+      { fondo },
       { new: true }
     );
-    if (!concursoUpdated) {
+    if (!updatedConcurso) {
       return [null, "Concurso no encontrado"];
     }
-    return [concursoUpdated, null];
+
+    return [updatedConcurso, null];
   } catch (error) {
-    handleError(error, "concurso.service -> updateIdPostulacion");
+    handleError(error, "concurso.service -> updateConcurso");
   }
 }
 
@@ -91,6 +94,7 @@ async function updateConcurso(id, concurso) {
       nombre,
       estado,
       postulaciones,
+      fondo,
       fechaAperturaConcurso,
       fechaCierreConcurso,
       fechaAnuncioGanadores,
@@ -101,6 +105,7 @@ async function updateConcurso(id, concurso) {
         nombre,
         estado,
         postulaciones,
+        fondo,
         fechaAperturaConcurso,
         fechaCierreConcurso,
         fechaAnuncioGanadores,
@@ -123,30 +128,28 @@ async function deleteConcurso(id) {
   }
 }
 
-async function deletePostulacionId(idConcurso, idPostulacion) {
+
+async function deleteFondoId(idConcurso, idFondo) {
   try {
     const concursoFound = await Concurso.findById(idConcurso);
     if (!concursoFound) {
       return [null, "Concurso no encontrado"];
     }
-
-    const postulacionFound = await Postulacion.findById(idPostulacion);
-    if (!postulacionFound) {
-      return [null, "Postulacion no encontrada"];
+    const fondoFound = await Fondo.findById(idFondo);
+    if (!fondoFound) {
+      return [null, "Fondo no encontrado"];
     }
-
     const updatedConcurso = await Concurso.findByIdAndUpdate(
       idConcurso,
-      { $pull: { postulaciones: idPostulacion } },
+      { $pull: { fondo: idFondo } },
       { new: true }
     );
-    if (!updatedConcurso) {
-      return [null, "Concurso no encontrado"];
-    }
 
-    return [updatedConcurso, null];
+    const concursoUpdated = await concursoFound.save();
+
+    return [concursoUpdated, null];
   } catch (error) {
-    handleError(error, "concurso.service -> deletePostulacionId");
+    handleError(error, "concurso.service -> deleteFondoId");
   }
 }
 
@@ -154,8 +157,8 @@ export const concursoService = {
   getConcursos,
   getConcursoById,
   createConcurso,
-  addPostulacionId,
+  addFondoId,
   updateConcurso,
   deleteConcurso,
-  deletePostulacionId,
+  deleteFondoId,
 };

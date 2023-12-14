@@ -70,26 +70,24 @@ async function createConcurso(req, res) {
   }
 }
 
-async function addPostulacionId(req, res) {
+async function addFondoId(req, res) {
   try {
     const { body, params } = req;
     const { error: paramsError } = concursoIdSchema.validate(params);
     if (paramsError) {
       return respondError(req, res, 400, paramsError.message);
     }
+
     const { id } = params;
-    const { postulaciones } = body;
-    const updatedConcurso = await concursoService.addPostulacionId(
-      id,
-      postulaciones
-    );
+    const { fondo } = body;
+    const updatedConcurso = await concursoService.addFondoId(id, fondo);
     if (!updatedConcurso) {
-      return respondError(req, res, 400, "No se pudo actualizar el concurso");
+      return respondError(req, res, 404, "Concurso no encontrado");
     }
     respondSuccess(req, res, 200, updatedConcurso);
   } catch (error) {
-    handleError(error, "concurso.controller -> updateIdPostulacion");
-    respondError(req, res, 500, "No se pudo actualizar el concurso");
+    handleError(error, "concurso.controller -> addFondoId");
+    respondError(req, res, 500, "No se pudo actualizar el id del Fondo");
   }
 }
 
@@ -146,30 +144,28 @@ async function deleteConcurso(req, res) {
   }
 }
 
-async function deletePostulacionId(req, res) {
+async function deleteFondoId(req, res) {
   try {
-    const { params } = req;
-    
-    const { idConcurso } = params;
-    const { idPostulacion } = params;
+    const { idConcurso } = req.params;
+    const { idFondo } = req.params;
 
-    const updatedConcurso = await concursoService.deletePostulacionId(
+    const updatedConcurso = await concursoService.deleteFondoId(
       idConcurso,
-      idPostulacion
+      idFondo
     );
 
     if (!updatedConcurso) {
       return respondError(
         req,
         res,
-        400,
-        "No se pudo eliminar la postulación del concurso"
+        404,
+        "No se pudo eliminar el fondo del concurso"
       );
     }
     respondSuccess(req, res, 200, updatedConcurso);
   } catch (error) {
-    handleError(error, "concurso.controller -> deletePostulacionId");
-    respondError(req,res,500,"No se pudo eliminar la postulación del concurso");
+    handleError(error, "concurso.controller -> deleteFondoId");
+    respondError(req, res, 500, "No se pudo eliminar el fondo del concurso");
   }
 }
 
@@ -177,8 +173,8 @@ export const concursoController = {
   getConcursos,
   getConcursoById,
   createConcurso,
-  addPostulacionId,
+  addFondoId,
   updateConcurso,
   deleteConcurso,
-  deletePostulacionId,
+  deleteFondoId,
 };

@@ -65,6 +65,8 @@ async function createFondo(req, res) {
     respondError(req, res, 500, "No se pudo crear el fondo");
   }
 }
+
+
 async function addCategoriaId(req, res) {
   try {
     const { body, params } = req;

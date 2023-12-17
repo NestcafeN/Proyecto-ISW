@@ -3,13 +3,10 @@
 import { handleError } from "../utils/errorHandler.js";
 import Fondo from "../models/fondo.model.js";
 import Categoria from "../models/categoria.model.js";
-import Concurso from "../models/concurso.model.js";
 
 async function getFondos() {
   try {
-    const fondos = await Fondo.find()
-      .populate("categoria")
-      .exec();
+    const fondos = await Fondo.find().populate("categoria").exec();
 
     if (!fondos) {
       return [null, "No hay fondos registrados"];
@@ -22,9 +19,7 @@ async function getFondos() {
 
 async function getFondoById(id) {
   try {
-    const fondo = await Fondo.findById(id)
-      .populate("categoria")
-      .exec();
+    const fondo = await Fondo.findById(id).populate("categoria").exec();
     if (!fondo) {
       return [null, "Fondo no encontrado"];
     }
@@ -57,24 +52,13 @@ async function createFondo(fondo) {
       fechaApertura,
       fechaCierre,
     });
-    await newFondo.validate();
     await newFondo.save();
     return [newFondo, null];
   } catch (error) {
-    // Procesa el error de validación de Mongoose para obtener los mensajes de error
-    if (error.errors) {
-      const validationErrors = {};
-      for (const key in error.errors) {
-        if (error.errors.hasOwnProperty(key)) {
-          validationErrors[key] = error.errors[key].message;
-        }
-      }
-      return [null, validationErrors];
-    } else {
-      handleError(error, "fondo.service -> createFondo");
-    }
+    handleError(error, "fondo.service -> createFondo");
   }
 }
+
 async function addCategoriaId(id, categoria) {
   try {
     const fondoFound = await Fondo.findById(id);
@@ -95,7 +79,6 @@ async function addCategoriaId(id, categoria) {
     handleError(error, "fondo.service -> updateFondo");
   }
 }
-
 
 async function updateMontoMaximo(id, montoMaximo) {
   try {
@@ -160,7 +143,6 @@ async function deleteFondo(id) {
     handleError(error, "fondo.service -> deleteFondo");
   }
 }
-
 
 async function deleteCategoriaId(idFondo, idCategoria) {
   try {

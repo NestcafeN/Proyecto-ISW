@@ -20,20 +20,21 @@ const router = createBrowserRouter([
         path: '/',
         element: <FondosPage />,
       },
+      {
+        path: '/fondos/create',
+        element: <FondosCreatePage />,
+      },
+      {
+        path: '/concursos/create',
+        element: <ConcursosCreatePage />,
+      },
     ],
   },
   {
     path: '/auth',
     element: <Login />,
   },
-  {
-    path: '/fondos/create',
-    element: <FondosCreatePage />,
-  },
-  {
-    path: '/concursos/create',
-    element: <ConcursosCreatePage />,
-  }
+
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

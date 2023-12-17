@@ -7,8 +7,8 @@ import FondosPage from './routes/FondosPage.jsx';
 import FondosCreatePage from './routes/FondosCreatePage.jsx'
 import ConcursosCreatePage from './routes/ConcursosCreatePage.jsx'
 import { ChakraProvider } from '@chakra-ui/react'
-
-
+import Rubrica from './routes/Rubrica.jsx'
+import EvaluacionPage from './routes/EvaluacionPage';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +28,14 @@ const router = createBrowserRouter([
         path: '/concursos/create',
         element: <ConcursosCreatePage />,
       },
+      {
+        path: '/rubrica',
+        element: <Rubrica />,
+      },
+      {
+        path: '/evaluacion', // Nueva ruta para EvaluacionPage
+        element: <EvaluacionPage />,
+      },
     ],
   },
   {
@@ -39,6 +47,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ChakraProvider>
-  <RouterProvider router={router} />
+    <RouterProvider router={router} />
   </ChakraProvider>
 );

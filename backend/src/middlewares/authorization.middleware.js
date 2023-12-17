@@ -53,4 +53,27 @@ async function isEvaluador(req, res, next) {
   }
 }
 
-export { isAdmin, isEvaluador };
+async function commonAccessMiddleware(req, res, next) {
+  try {
+    const user = await User.findOne({ email: req.email });
+    const roles = await Role.find({ _id: { $in: user.roles } });
+
+    // Verifica si el usuario tiene el rol de administrador o evaluador
+    const isAdminOrEvaluador = roles.some(role => ["admin", "evaluador"].includes(role.name));
+
+    if (isAdminOrEvaluador) {
+      next();
+    } else {
+      return respondError(
+        req,
+        res,
+        401,
+        "Se requiere un rol de administrador o evaluador para realizar esta acción"
+      );
+    }
+  } catch (error) {
+    handleError(error, "authorization.middleware -> commonAccessMiddleware");
+  }
+}
+
+export { isAdmin, isEvaluador, commonAccessMiddleware };

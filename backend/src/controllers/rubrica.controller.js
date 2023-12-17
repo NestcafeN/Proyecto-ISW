@@ -7,10 +7,11 @@ import { respondSuccess, respondError } from '../utils/resHandler.js';
 export async function getRubricas(req, res) {
   try {
     const [rubricas, error] = await rubricaService.getRubricas();
+    const formattedRubricas = rubricas.map(formatRubrica);
     if (error) {
       return respondError(req, res, 500, 'Error al obtener las Rúbricas', error);
     }
-    respondSuccess(req, res, 200, rubricas);
+    respondSuccess(req, res, 200, { rubricas: formattedRubricas });
   } catch (error) {
     handleError(error, 'rubrica.controller -> getRubricas');
     respondError(req, res, 500, 'Error al obtener las Rúbricas');
@@ -21,6 +22,7 @@ export async function getRubricaById(req, res) {
   try {
     const { params } = req;
     const { error: paramsError } = rubricaIdSchema.validate(params);
+
     if (paramsError) {
       return respondError(req, res, 400, paramsError.message);
     }
@@ -33,7 +35,10 @@ export async function getRubricaById(req, res) {
     if (!rubrica) {
       return respondError(req, res, 404, 'Rúbrica no encontrada');
     }
-    respondSuccess(req, res, 200, rubrica);
+
+    const formattedRubrica = formatRubrica(rubrica);
+
+    respondSuccess(req, res, 200, formattedRubrica);
   } catch (error) {
     handleError(error, 'rubrica.controller -> getRubricaById');
     respondError(req, res, 500, 'Error al obtener la Rúbrica');
@@ -43,7 +48,7 @@ export async function getRubricaById(req, res) {
 export async function createRubrica(req, res) {
   try {
     const { error, value } = rubricaBodySchema.validate(req.body, { abortEarly: false });
-
+    console.log('Cuerpo de la solicitud:', req.body);
     if (error) {
       console.log('bodyError:', error); // Agrega este console.log
       return respondError(req, res, 400, 'Error al crear Rúbrica', error.details);
@@ -54,11 +59,11 @@ export async function createRubrica(req, res) {
     }
 
     const [rubrica, errorCreate] = await rubricaService.createRubrica(value);
+
     if (errorCreate) {
       console.log('errorCreate:', errorCreate); // Agrega este console.log
       return respondError(req, res, 400, 'Error al crear Rúbrica', errorCreate);
     }
-
     respondSuccess(req, res, 201, rubrica);
   } catch (error) {
     if (error.code && error.code === 11000) {
@@ -169,6 +174,27 @@ async function deleteCriterioById(req, res) {
   }
 }
 
+function formatRubrica(rubrica) {
+  return {
+    _id: rubrica._id,
+    nombre: rubrica.nombre,
+    tipoFondo: rubrica.tipoFondo,
+    criterios: rubrica.criterios,
+    puntajeMinimoAprobacion: rubrica.puntajeMinimoAprobacion,
+    puntajeMaximoAprobacion: rubrica.puntajeMaximoAprobacion,
+    puntajeTotal: rubrica.puntajeTotal,
+    estado: rubrica.estado,
+    fechaCreacion: formatDate(rubrica.fechaCreacion),
+    fechaModificacion: formatDate(rubrica.fechaModificacion),
+  };
+}
+
+// Función para formatear una fecha a 'dd-mm-yyyy'
+function formatDate(date) {
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  return new Date(date).toLocaleDateString(undefined, options);
+}
+
 export const rubricaController = {
   getRubricas,
   getRubricaById,
@@ -177,4 +203,6 @@ export const rubricaController = {
   deleteRubrica,
   addCriterioById,
   deleteCriterioById,
+  formatRubrica,
+  formatDate,
 };

@@ -9,6 +9,7 @@ import ConcursosCreatePage from './routes/ConcursosCreatePage.jsx'
 import { ChakraProvider } from '@chakra-ui/react'
 import Rubrica from './routes/Rubrica.jsx'
 import EvaluacionPage from './routes/EvaluacionPage';
+import CategoriasCreatePage from './routes/CategoriasCreatePage.jsx'
 
 const router = createBrowserRouter([
   {

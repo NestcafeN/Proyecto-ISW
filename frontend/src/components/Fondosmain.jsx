@@ -1,16 +1,17 @@
-import { Card, CardBody, CardFooter, Stack, Text, Heading, Divider, Button, ButtonGroup, SimpleGrid } from '@chakra-ui/react'
+import { Card, CardBody, useToast, CardFooter, Stack, Text, Heading, Divider, Button, ButtonGroup, SimpleGrid} from '@chakra-ui/react'
+import { ViewIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
-import axios from '../services/root.service.js';
+import axios from '../services/root.service'
+import FondoDelete from './FondosDelete';
 
 
-
-
-
-function Fondosmain() {
-  
+function Fondosmain({ onEliminarClick}) {
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const toast = useToast();
   const [fondo, setFondos] = useState([]);
   
-  useEffect(() => { //funciona 
+  
+  useEffect(() => { 
     axios.get('fondos')
       .then(response => {
         setFondos(response.data.data);
@@ -20,6 +21,39 @@ function Fondosmain() {
       });
   }, []);
 
+  const formatearFechas = (fechaApertura, fechaCierre) => {
+    const fechaAperturaFormatted = new Date(fechaApertura).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    const fechaCierreFormatted = new Date(fechaCierre).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    return `${fechaAperturaFormatted} - ${fechaCierreFormatted}`;
+  };
+  const showToast = () => {
+    toast({
+      title: 'Eliminar Fondo',
+      description: 'El fondo ha sido eliminada con éxito',
+      duration: 2000,
+      isClosable: false,
+      status: 'success',
+      position: 'top'
+    })
+}
+
+  
+
+const handleEliminarClick = () => {
+  setDeleteDialogOpen(true);
+};
+
+const handleDeleteConfirm = () => {
+  onEliminarClick(fondo);
+  setDeleteDialogOpen(false);
+  showToast();
+};
+
+
+const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+  };
+
   return (
     <>
       <SimpleGrid columns={4} spacing={4}>
@@ -28,21 +62,26 @@ function Fondosmain() {
           <CardBody>
             <Stack mt='6' spacing='3'>
               <Heading size='md'>{fondos.nombre}</Heading>
-              <Text>{fondos.descripcion}</Text>
+              <Text>Descripcion: {fondos.descripcion}</Text>
               <Text>Monto del Fondo: {fondos.montoMax}</Text>
               <Text>
-                Fechas de apertura y cierre: {fondos.fechaApertura} - {fondos.fechaCierre}
+                Fechas de apertura y cierre: {formatearFechas(fondos.fechaApertura, fondos.fechaCierre)}
               </Text>
             </Stack>
           </CardBody>
           <Divider />
           <CardFooter>
             <ButtonGroup spacing='2'>
-              <Button variant='solid' colorScheme='cyan'>
-                Ver detalles
-              </Button>
+              <Button onClick={handleEliminarClick}>
+                <DeleteIcon color="black" />Eliminar</Button>
             </ButtonGroup>
           </CardFooter>
+          <FondoDelete
+        isOpen={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onDelete={handleDeleteConfirm}
+        fondo={fondo}
+      />
         </Card>
       ))}
     </SimpleGrid>

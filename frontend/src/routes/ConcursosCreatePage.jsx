@@ -1,10 +1,12 @@
 import ConcursosCreate from "../components/ConcursosCreate";
 
-function ConcursosCreatePage() {
+const ConcursosCreatePage = () => {
+
   return (
     <>
     <ConcursosCreate/>
     </>
   );
 }
+
 export default ConcursosCreatePage;

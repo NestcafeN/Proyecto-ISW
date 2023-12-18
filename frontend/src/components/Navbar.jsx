@@ -51,6 +51,7 @@ function Navbar() {
   const navAdmin = [
     { name: ' Crear Fondos', href: '/fondos/create', current: false },
     { name: 'Crear Concursos', href: '/concursos/create', current: false },
+    { name: 'Categorias', href: '/categorias/create', current: false},
     { name: 'Postulaciones', href: '#', current: false },
     { name: 'Rubricas', href: '/rubrica', current: false },
   ];

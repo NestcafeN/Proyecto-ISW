@@ -1,89 +1,78 @@
 import { Container, FormControl, FormLabel, Input, Select, Button } from '@chakra-ui/react'
-import axios from '../services/root.service.js';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from '../services/root.service'
+import { createConcurso } from '../services/concurso.service';
 
 
 function ConcursosCreate() {
   
-  
-  const [fondo, setFondos] = useState([]);
-    
-  useEffect(() => {
-    axios.get('fondos') // funciona 
-      .then(response => {
-        setFondos(response.data.data);
-      })
-      .catch(error => {
-        console.error('Error al obtener los Fondos:', error);
-      });
-  }, []);
-
-  const [formConcursoData, setFormConcursoData] = useState({
+  const [newConcurso, setNewConcurso] = useState({
     nombre: '',
     estado: '',
-    fondo: '', 
+    fondo: [{ _id: '', nombre: '' }], 
     fechaAperturaConcurso: '',
     fechaCierreConcurso: '',
     fechaAnuncioGanadores: '',
   });
+  
+  const [fondos, setFondos] = useState([]);
+  
+  useEffect(() => { //funciona 
+    axios.get('fondos')
+      .then(response => {
+        setFondos(response.data.data);
+      })
+      .catch(error => {
+        console.error('Error al obtener los fondos:', error);
+      });
+  }, []);
 
-  const handleCreateConcurso = async () => {
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewConcurso((prev) => ({ ...prev, [name]: value }));
+  };
   
 
-    try { // no funciona
-      // Realiza la solicitud POST para crear el concurso
-      const response = await axios.post('concursos', formConcursoData);
-      console.log('Concurso creado:', response.data);
-      // Puedes redirigir al usuario a otra página o realizar alguna acción adicional
+  const [selectedFondo, setSelectedFondo] = useState('');
+
+
+  const handleCreateConcurso = async () => {
+    try {
+      const { id, _id, fondo, ...concursoWithoutId } = newConcurso;
+  
+      console.log('Datos a enviar para crear el Concurso:', {
+        ...concursoWithoutId,
+        fondo: [selectedFondo],
+      });
+  
+      await createConcurso({ ...concursoWithoutId, fondo: [selectedFondo] });
+      console.log('Nuevo Concurso creado:', newConcurso);
     } catch (error) {
-      // Manejar errores en la solicitud
-      console.error('Error al crear concurso:', error);
-    }
-  };
-  const formatDate = (inputDate) => { // no funciona
-    const [day, month, year] = inputDate.split('-');
-    return `${year}-${month}-${day}`;
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    // Si el campo es una fecha, formatea la fecha antes de actualizar el estado
-    if (name.includes('fecha')) {
-      const formattedDate = formatDate(value);
-      setFormConcursoData((prevData) => ({
-        ...prevData,
-        [name]: formattedDate,
-      }));
-    } else {
-      // Si no es un campo de fecha, actualiza el estado directamente
-      setFormConcursoData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      console.error('Error al crear el concurso:', error.message);
     }
   };
 
 
   return (
-    <>
+    
     <Container>
     <FormControl isRequired>
       <FormLabel>Nombre</FormLabel>
       <Input
           name= 'nombre' 
           placeholder='Ingrese el Nombre' 
-          value={formConcursoData.nombre}
-          onChange={handleInputChange}/>
+          value={newConcurso.nombre}
+          onChange={handleChange}/>
     </FormControl>
 
     <FormControl isRequired>
   <FormLabel>Estado</FormLabel>
   <Select
+    name='estado'
     placeholder='Seleccione un Estado'
-    onChange={handleInputChange}
-  >
+    onChange={handleChange}
+    value={newConcurso.estado}>
+
     <option value='Abierto'>Abierto</option>
     <option value='Cerrado'>Cerrado</option>
     <option value='En revisión'>En Revisión</option>
@@ -91,46 +80,49 @@ function ConcursosCreate() {
   </Select>
 </FormControl>
 
-    <FormControl>
+    <FormControl isRequired>
         <FormLabel>Fondos</FormLabel>
-          <Select
-            placeholder="Seleccione un Fondo"
-            onChange={handleInputChange}>
-            
-              
-          {fondo.map((fondos) => (
-            
-        <option key={fondos._id} value={fondos._id}>
-        {fondos.nombre}
-        </option>
-  ))}
+          
+<Select
+  placeholder="Seleccione un Fondo"
+  value={selectedFondo}
+  onChange={(e) => setSelectedFondo(e.target.value)}
+>
+
+{fondos.map((fondo) => (
+      <option key={fondo._id} value={fondo._id}>
+        {fondo.nombre}
+      </option>
+    ))}
 </Select>
     </FormControl>
 
     <FormControl isRequired>
       <FormLabel>Fecha de Apertura del Concurso</FormLabel>
         <Input type='date'
-        value={formConcursoData.fechaAperturaConcurso}
-        onChange={handleInputChange}/>
+        value={newConcurso.fechaAperturaConcurso}
+        onChange={(e) => handleChange({ target: { name: 'fechaAperturaConcurso', value: e.target.value } })}/>
     </FormControl>
 
     <FormControl isRequired>
       <FormLabel>Fecha de Cierre del Concurso</FormLabel>
         <Input type='date'
-        value={formConcursoData.fechaCierreConcurso}
-        onChange={handleInputChange}/>
+        value={newConcurso.fechaCierreConcurso}
+        onChange={(e) => handleChange({ target: { name: 'fechaCierreConcurso', value: e.target.value } })}/>
     </FormControl>
 
     <FormControl isRequired>
       <FormLabel>Fecha de Anuncio Ganadores del Concurso</FormLabel>
         <Input type='date'
-        value={formConcursoData.fechaAnuncioGanadores}
-        onChange={handleInputChange}/>
+        value={newConcurso.fechaAnuncioGanadores}
+        onChange={(e) => handleChange({ target: { name: 'fechaAnuncioGanadores', value: e.target.value } })}/>
     </FormControl>
 
-  <Button colorScheme='teal' variant='solid' onClick={handleCreateConcurso}> Crear </Button>
+    <Button colorScheme="blue" mr={3} onClick={handleCreateConcurso}>
+                        Crear Concurso
+                    </Button>
   </Container>
-  </>
+  
     )
 }
 export default ConcursosCreate;

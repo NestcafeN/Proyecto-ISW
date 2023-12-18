@@ -47,23 +47,19 @@ async function createFondo(req, res) {
       return respondError(req, res, 400, bodyError.message);
     }
     const [newFondo, errorFondo] = await fondoService.createFondo(body);
+
     if (errorFondo) {
       return respondError(req, res, 400, errorFondo);
     }
-    if (newFondo) {
-      return respondSuccess(req, res, 201, newFondo);
-    } else {
-      if (errorFondo) {
-        // Devuelve los mensajes de validación como respuesta
-        return respondError(req, res, 400, "Error de validación", errorFondo);
-      } else {
-        return respondError(req, res, 400, "No se pudo crear el fondo");
-      }
+    if (!newFondo) {
+      return respondSuccess(req, res, 400, "No se pudo crear el fondo");
     }
+    respondSuccess(req, res, 201, newFondo);
   } catch (error) {
     handleError(error, "fondo.controller -> createFondo");
     respondError(req, res, 500, "No se pudo crear el fondo");
   }
+
 }
 
 

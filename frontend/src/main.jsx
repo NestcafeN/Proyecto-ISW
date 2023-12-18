@@ -36,6 +36,10 @@ const router = createBrowserRouter([
         path: '/evaluacion',
         element: <EvaluacionPage />,
       },
+      {
+        path: 'categorias/create',
+        element: <CategoriasCreatePage />,
+      }
     ],
   },
   {

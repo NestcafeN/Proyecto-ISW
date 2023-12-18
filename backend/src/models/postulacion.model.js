@@ -28,6 +28,12 @@ const postulacionSchema = new Schema({
       message: "RUT inválido, por favor ingrese un RUT válido.",
     },
   },
+  
+  concurso: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Concurso', // Nombre del modelo referenciado
+    required: true
+  },
   correo: {
     type: String,
     required: true,

@@ -70,11 +70,12 @@ async function updatePostulacion(req, res) {
     }
 
     const { id } = params;
-    const { nombreCompleto, rut, correo, direccion, proyecto, fechaPostulacion } = body;
+    const { nombreCompleto, rut, correo, concurso, direccion, proyecto, fechaPostulacion } = body;
     const updatedPostulacion = await postulacionService.updatePostulacion(id, {
       nombreCompleto,
       rut,
       correo,
+      concurso,
       direccion,
       proyecto,
       fechaPostulacion,

@@ -30,12 +30,13 @@ async function getPostulacionById(id) {
 
 async function createPostulacion(postulacion) {
   try {
-    const { nombreCompleto, rut, correo, direccion, proyecto, estado, fechaPostulacion } = postulacion;
+    const { nombreCompleto, rut, correo, concurso, direccion, proyecto, estado, fechaPostulacion } = postulacion;
 
     const newPostulacion = new Postulacion({
       nombreCompleto,
       rut,
       correo,
+      concurso,
       direccion,
       proyecto,
       estado,
@@ -99,3 +100,4 @@ export const postulacionService = {
   deletePostulacion,
   updateEstadoPostulacion
 };
+

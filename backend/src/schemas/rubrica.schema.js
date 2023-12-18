@@ -6,10 +6,15 @@ const rubricaBodySchema = Joi.object({
     "any.required": "El nombre de la rúbrica es obligatorio",
     "string.base": "El nombre de la rúbrica debe ser de tipo string",
   }),
-  tipoFondo: Joi.string().required().messages({
-    "string.empty": "El tipo de fondo de la rúbrica no puede estar vacío",
-    "any.required": "El tipo de fondo de la rúbrica es obligatorio",
-    "string.base": "El tipo de fondo de la rúbrica debe ser de tipo string",
+  categorias: Joi.string().required().messages({
+    "string.empty": "El id de la categoria no puede estar vacia",
+    "any.required": "El id de la categoria es obligatorio",
+    "array base": "El id de la categoria debe ser de tipo string",
+  }),
+  postulacion: Joi.string().required().messages({
+    "string.empty": "El id de la postulación no puede estar vacia",
+    "any.required": "El id de la postulación es obligatorio",
+    "array base": "El id de la postulación debe ser de tipo string",
   }),
   criterios: Joi.array().required().messages({
     "array.empty": "El id del criterio no puede estar vacio",

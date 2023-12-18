@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardHeader, Flex, Box, CardBody, CardFooter, Divider, Heading, Text, Button, HStack, useToast } from '@chakra-ui/react';
 import { ViewIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons';
-import RubricaDelete from './RubricaDelete'; // Importa el nuevo componente
+import RubricaDelete from './RubricaDelete';
 
-const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEliminarClick }) => {
+
+const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEvaluarClick }) => {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { nombre, tipoFondo, _id } = rubrica;
+  const { nombre, postulacion, _id } = rubrica;
   const toast = useToast();
 
   const showToast = () => {
-      toast({
-        title: 'Eliminar Rúbrica',
-        description: 'La Rúbrica ha sido eliminada con éxito',
-        duration: 2000,
-        isClosable: false,
-        status: 'success',
-        position: 'top'
-      })
-  }
+    toast({
+      title: 'Eliminar Rúbrica',
+      description: 'La Rúbrica ha sido eliminada con éxito',
+      duration: 2000,
+      isClosable: false,
+      status: 'success',
+      position: 'top',
+    });
+  };
+
   const handleEliminarClick = () => {
     setDeleteDialogOpen(true);
   };
@@ -34,15 +36,15 @@ const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEliminarClick }) =>
   };
 
   const RubricaCardStyles = {
-    bg: "white",
-    h: "220px",
-    w: "350px",
-    borderTop: "8px",
-    borderColor: "blue.500"
+    bg: 'white',
+    h: '220px',
+    w: '350px',
+    borderTop: '8px',
+    borderColor: 'blue.500',
   };
 
   const IconStyle = {
-    marginRight: "8px"
+    marginRight: '8px',
   };
 
   return (
@@ -54,7 +56,6 @@ const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEliminarClick }) =>
           </Box>
           <Box>
             <Heading as="h3" size="sm">{nombre}</Heading>
-            <Text>para {tipoFondo}</Text>
           </Box>
         </Flex>
       </CardHeader>
@@ -62,9 +63,17 @@ const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEliminarClick }) =>
       <Divider borderColor="gray.200" />
       <CardFooter>
         <HStack h="20px">
-          <Button onClick={() => onVerClick(rubrica)}><ViewIcon color="black" sx={IconStyle} />Ver</Button>
+          <Button onClick={() => onVerClick(rubrica)}>
+            <ViewIcon color="black" sx={IconStyle} />
+            Ver
+          </Button>
           <Button onClick={() => onEditarClick(rubrica)}><EditIcon color="black" sx={IconStyle} />Editar</Button>
           <Button onClick={handleEliminarClick}><DeleteIcon color="black" sx={IconStyle} />Eliminar</Button>
+          {onEvaluarClick && (
+            <Button onClick={() => onEvaluarClick(rubrica)}>
+              Evaluar
+            </Button>
+          )}
         </HStack>
       </CardFooter>
       <RubricaDelete
@@ -80,8 +89,9 @@ const RubricaCard = ({ rubrica, onVerClick, onEditarClick, onEliminarClick }) =>
 RubricaCard.propTypes = {
   rubrica: PropTypes.object.isRequired,
   onVerClick: PropTypes.func.isRequired,
-  onEditarClick: PropTypes.func.isRequired,
-  onEliminarClick: PropTypes.func.isRequired,
+  onEditarClick: PropTypes.func,
+  onEvaluarClick: PropTypes.func,
+  onEliminarClick: PropTypes.func,
 };
 
 export default RubricaCard;

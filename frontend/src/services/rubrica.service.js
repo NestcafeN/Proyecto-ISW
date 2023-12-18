@@ -16,8 +16,8 @@ export const createRubrica = async (newRubrica) => {
     // Muestra el contenido del cuerpo de la respuesta en caso de un error 400
     if (error.response && error.response.data) {
       console.error('Detalles del error:', error.response.data);
-    }
-    
+  }
+
     throw error; // Reenvía el error para que pueda ser manejado por el código que llama a esta función
   }
 };
@@ -31,8 +31,6 @@ export const getRubrica = async () => {
 
     if (response.status === 200 && response.data.state === "Success") {
       const rubricasArray = response.data.data.rubricas;
-
-      console.log("Data from getRubrica:", rubricasArray);
 
       if (Array.isArray(rubricasArray)) {
         return rubricasArray;
@@ -49,7 +47,6 @@ export const getRubrica = async () => {
     return [];
   }
 };
-
 
 export const deleteRubrica = async (rubricaId) => {
   try {

@@ -13,6 +13,7 @@ const RubricaView = ({ isOpen, onClose, rubrica }) => {
     }
 
     const criterios = rubrica && rubrica.criterios ? rubrica.criterios : [];
+    const postulacion = rubrica && rubrica.postulacion ? rubrica.postulacion : {};
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={false}>
@@ -21,12 +22,14 @@ const RubricaView = ({ isOpen, onClose, rubrica }) => {
                 <ModalHeader>{rubrica.nombre}</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <Text sx={ViewStyles}>Tipo de Fondo:</Text>
-                    <Text>{rubrica.tipoFondo}</Text>
+                    <Text sx={ViewStyles}>Categoría:</Text>
+                    <Text>{rubrica.categorias ? rubrica.categorias.nombre : ''}</Text>
                     <Text sx={ViewStyles}>Criterios: </Text>
-                    {rubrica.criterios && rubrica.criterios.map((criterio, index) => (
+                    {criterios && criterios.map((criterio, index) => (
                         <Text key={criterio.id || index}>{criterio.nombre}</Text>
                     ))}
+                    <Text sx={ViewStyles}>Postulación: </Text>
+                    <Text>{postulacion.proyecto}</Text>
                     <Text sx={ViewStyles}>Puntaje Mínimo de Aprobación:</Text>
                     <Text>{rubrica.puntajeMinimoAprobacion}</Text>
                     <Text sx={ViewStyles}>Puntaje Máximo de Aprobación:</Text>

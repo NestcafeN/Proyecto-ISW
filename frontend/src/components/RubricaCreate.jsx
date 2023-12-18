@@ -18,30 +18,48 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { getCriterios } from '../services/criterio.service';
+import { getCategorias } from '../services/categoria.service';
+import { getPostulaciones } from '../services/postulacion.service';
 import { createRubrica } from '../services/rubrica.service';
 
 const RubricaCreate = ({ isOpen, onClose }) => {
     const [newRubrica, setNewRubrica] = useState({
         nombre: '',
-        tipoFondo: '',
+        categorias: '',
+        postulacion: '',
+        criterios: [{ _id: '', nombre: '' }],
         puntajeMinimoAprobacion: '',
         puntajeMaximoAprobacion: '',
-        criterios: [{ _id: '', nombre: '' }], // Al menos un criterio inicial
     });
 
     const [criterios, setCriterios] = useState([]);
+    const [categorias, setCategorias] = useState([]);
+    const [postulaciones, setPostulaciones] = useState([]);
 
     useEffect(() => {
-        const fetchCriterios = async () => {
+        const fetchData = async () => {
             try {
                 const listaCriterios = await getCriterios();
+                const listaCategorias = await getCategorias();
+                const listaPostulaciones = await getPostulaciones();
+
                 setCriterios(listaCriterios);
+                setCategorias(listaCategorias);
+                setPostulaciones(listaPostulaciones);
             } catch (error) {
-                console.error('Error al obtener criterios:', error.message);
+                console.error('Error al obtener datos:', error.message);
             }
         };
-        fetchCriterios();
+        fetchData();
     }, []);
+
+    const handleCategoriaChange = (value) => {
+        setNewRubrica((prev) => ({ ...prev, categorias: value }));
+    };
+
+    const handlePostulacionChange = (value) => {
+        setNewRubrica((prev) => ({ ...prev, postulacion: value }));
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -76,22 +94,13 @@ const RubricaCreate = ({ isOpen, onClose }) => {
 
     const handleCreateRubrica = async () => {
         try {
-            // Elimina las propiedades 'id' y '_id' del objeto antes de enviar la solicitud
             const { id, _id, ...rubricaWithoutId } = newRubrica;
-
-            // Mapear los criterios para obtener solo los _id
             const criteriosIds = newRubrica.criterios.map((criterio) => criterio._id);
-
-            console.log('Datos a enviar para crear la rúbrica:', {
-                ...rubricaWithoutId,
-                criterios: criteriosIds,
-            });
 
             await createRubrica({ ...rubricaWithoutId, criterios: criteriosIds });
             console.log('Nueva Rúbrica creada:', newRubrica);
-            // Puedes realizar alguna acción adicional después de crear la rúbrica si es necesario
-            // Por ejemplo, redirigir a la página de detalles de la rúbrica, etc.
-            onClose(); // Cierra el modal después de crear la rúbrica
+            onClose();
+            window.location.reload(); // Esto recargará la página
         } catch (error) {
             console.error('Error al crear la rúbrica:', error.message);
         }
@@ -104,15 +113,40 @@ const RubricaCreate = ({ isOpen, onClose }) => {
                 <ModalHeader>Crear Nueva Rúbrica</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    {/* Formulario para la creación de la rúbrica */}
                     <Box>
                         <FormControl mb={4}>
                             <FormLabel>Nombre</FormLabel>
                             <Input type="text" name="nombre" value={newRubrica.nombre} onChange={handleChange} />
                         </FormControl>
                         <FormControl mb={4}>
-                            <FormLabel>Tipo de Fondo</FormLabel>
-                            <Input type="text" name="tipoFondo" value={newRubrica.tipoFondo} onChange={handleChange} />
+                            <FormLabel>Categoría</FormLabel>
+                            <Select
+                                name="categorias"
+                                value={newRubrica.categorias}
+                                onChange={(e) => handleCategoriaChange(e.target.value)}
+                                placeholder="Seleccionar una Categoría"
+                            >
+                                {categorias.map((categorias) => (
+                                    <option key={categorias._id} value={categorias._id}>
+                                        {categorias.nombre}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl mb={4}>
+                            <FormLabel>Postulación</FormLabel>
+                            <Select
+                                name="postulacion"
+                                value={newRubrica.postulacion}
+                                onChange={(e) => handlePostulacionChange(e.target.value)}
+                                placeholder="Seleccionar una Postulación"
+                            >
+                                {postulaciones.map((postulacion) => (
+                                    <option key={postulacion._id} value={postulacion._id}>
+                                        {postulacion.proyecto}
+                                    </option>
+                                ))}
+                            </Select>
                         </FormControl>
                         <FormControl mb={4}>
                             <FormLabel>Puntaje Mínimo de Aprobación</FormLabel>

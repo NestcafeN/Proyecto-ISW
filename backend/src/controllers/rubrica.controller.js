@@ -1,5 +1,4 @@
 import { rubricaService } from '../services/rubrica.service.js';
-import { criterioService } from '../services/criterio.service.js';
 import { rubricaBodySchema, rubricaIdSchema } from '../schemas/rubrica.schema.js';
 import { handleError } from '../utils/errorHandler.js';
 import { respondSuccess, respondError } from '../utils/resHandler.js';
@@ -8,6 +7,7 @@ export async function getRubricas(req, res) {
   try {
     const [rubricas, error] = await rubricaService.getRubricas();
     const formattedRubricas = rubricas.map(formatRubrica);
+
     if (error) {
       return respondError(req, res, 500, 'Error al obtener las Rúbricas', error);
     }
@@ -21,13 +21,15 @@ export async function getRubricas(req, res) {
 export async function getRubricaById(req, res) {
   try {
     const { params } = req;
+    const { id } = params;
     const { error: paramsError } = rubricaIdSchema.validate(params);
 
     if (paramsError) {
       return respondError(req, res, 400, paramsError.message);
     }
 
-    const [rubrica, error] = await rubricaService.getRubricaById(params.id);
+    const [rubrica, error] = await rubricaService.getRubricaById(id);
+
     if (error) {
       return respondError(req, res, 500, 'Error al obtener la Rúbrica', error);
     }
@@ -37,8 +39,7 @@ export async function getRubricaById(req, res) {
     }
 
     const formattedRubrica = formatRubrica(rubrica);
-
-    respondSuccess(req, res, 200, formattedRubrica);
+    return respondSuccess(req, res, 200, formattedRubrica);
   } catch (error) {
     handleError(error, 'rubrica.controller -> getRubricaById');
     respondError(req, res, 500, 'Error al obtener la Rúbrica');
@@ -48,9 +49,8 @@ export async function getRubricaById(req, res) {
 export async function createRubrica(req, res) {
   try {
     const { error, value } = rubricaBodySchema.validate(req.body, { abortEarly: false });
-    console.log('Cuerpo de la solicitud:', req.body);
+
     if (error) {
-      console.log('bodyError:', error); // Agrega este console.log
       return respondError(req, res, 400, 'Error al crear Rúbrica', error.details);
     }
 
@@ -61,7 +61,6 @@ export async function createRubrica(req, res) {
     const [rubrica, errorCreate] = await rubricaService.createRubrica(value);
 
     if (errorCreate) {
-      console.log('errorCreate:', errorCreate); // Agrega este console.log
       return respondError(req, res, 400, 'Error al crear Rúbrica', errorCreate);
     }
     respondSuccess(req, res, 201, rubrica);
@@ -175,15 +174,17 @@ async function deleteCriterioById(req, res) {
 }
 
 function formatRubrica(rubrica) {
+  console.log("Fecha de creación:", rubrica.fechaCreacion);
+  console.log("Fecha de modificación:", rubrica.fechaModificacion);
+
   return {
     _id: rubrica._id,
     nombre: rubrica.nombre,
-    tipoFondo: rubrica.tipoFondo,
+    categorias: rubrica.categorias,
+    postulacion: rubrica.postulacion,
     criterios: rubrica.criterios,
     puntajeMinimoAprobacion: rubrica.puntajeMinimoAprobacion,
     puntajeMaximoAprobacion: rubrica.puntajeMaximoAprobacion,
-    puntajeTotal: rubrica.puntajeTotal,
-    estado: rubrica.estado,
     fechaCreacion: formatDate(rubrica.fechaCreacion),
     fechaModificacion: formatDate(rubrica.fechaModificacion),
   };

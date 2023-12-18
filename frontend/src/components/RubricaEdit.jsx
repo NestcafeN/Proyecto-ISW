@@ -17,48 +17,73 @@ import {
 } from '@chakra-ui/react';
 import { DeleteIcon, AddIcon } from '@chakra-ui/icons';
 import { getCriterios } from '../services/criterio.service';
+import { getCategorias } from '../services/categoria.service';
+import { getPostulaciones } from '../services/postulacion.service';
 import { updateRubrica } from '../services/rubrica.service';
 
 
 const RubricaEdit = ({ isOpen, onClose, rubrica }) => {
+    console.log('Rúbrica recibida en RubricaEdit:', rubrica);
     const [editedRubrica, setEditedRubrica] = useState({
         _id: rubrica._id || '',
         nombre: rubrica.nombre || '',
-        tipoFondo: rubrica.tipoFondo || '',
+        categorias: rubrica.categorias || '',
+        postulacion: rubrica.postulacion || '',
         criterios: rubrica.criterios || [],
         puntajeMinimoAprobacion: rubrica.puntajeMinimoAprobacion || '',
         puntajeMaximoAprobacion: rubrica.puntajeMaximoAprobacion || '',
     });
 
     const [criterios, setCriterios] = useState([]);
-    const [selectedCriterios, setSelectedCriterios] = useState(Array(editedRubrica.criterios.length).fill(''));
-    const [nextCriterioId, setNextCriterioId] = useState(1);
+    const [categorias, setCategorias] = useState([]);
+    const [postulaciones, setPostulaciones] = useState([]);
+    const [nextCriterioId] = useState(1);
+    const [selectedCriterios, setSelectedCriterios] = useState(
+        (editedRubrica.criterios || []).map((c) => c._id) || []
+    );
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const listaCriterios = await getCriterios();
+                const listaCategorias = await getCategorias();
+                const listaPostulaciones = await getPostulaciones();
+
+                setCriterios(listaCriterios);
+                setCategorias(listaCategorias);
+                setPostulaciones(listaPostulaciones);
+            } catch (error) {
+                console.error('Error al obtener datos:', error.message);
+            }
+        };
+        fetchData();
+    }, []);
 
     useEffect(() => {
         console.log('Rúbrica recibida en RubricaEdit:', rubrica);
-        // Actualizamos el estado de editedRubrica si cambia la rúbrica
         setEditedRubrica((prev) => ({
             ...prev,
-            id: rubrica._id || '', // Cambiado de rubrica.id a rubrica._id
+            id: rubrica._id || '',
             nombre: rubrica.nombre || '',
-            tipoFondo: rubrica.tipoFondo || '',
+            categorias: rubrica.categorias || '', // Asegúrate de que categorias refleje el valor correcto
+            postulacion: rubrica.postulacion || '',
             criterios: rubrica.criterios || [],
             puntajeMinimoAprobacion: rubrica.puntajeMinimoAprobacion || '',
             puntajeMaximoAprobacion: rubrica.puntajeMaximoAprobacion || '',
         }));
+        handleCategoriaChange(rubrica.categorias || ''); // Asegúrate de que categorias se establezca correctamente aquí
+        handlePostulacionChange(rubrica.postulacion || '');
     }, [rubrica]);
 
-    useEffect(() => {
-        const fetchCriterios = async () => {
-            try {
-                const listaCriterios = await getCriterios();
-                setCriterios(listaCriterios);
-            } catch (error) {
-                console.error('Error al obtener criterios:', error.message);
-            }
-        };
-        fetchCriterios();
-    }, []);
+
+    const handleCategoriaChange = (value) => {
+        setEditedRubrica((prev) => ({ ...prev, categorias: value }));
+    };
+
+    const handlePostulacionChange = (value) => {
+        setEditedRubrica((prev) => ({ ...prev, postulacion: value }));
+    };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -118,7 +143,7 @@ const RubricaEdit = ({ isOpen, onClose, rubrica }) => {
             const { id, _id, ...rubricaWithoutId } = editedRubrica;
 
             // Mapear los selectedCriterios para obtener solo los _id
-            const criteriosIds = selectedCriterios.map((criterio) => criterio._id);
+            const criteriosIds = (selectedCriterios || []).map((criterio) => criterio._id);
 
             console.log('Edited Rubrica before save:', editedRubrica);
             console.log('Selected Criterios:', selectedCriterios);
@@ -144,8 +169,34 @@ const RubricaEdit = ({ isOpen, onClose, rubrica }) => {
                         <Input type="text" name="nombre" value={editedRubrica.nombre} onChange={handleChange} />
                     </FormControl>
                     <FormControl mb={4}>
-                        <FormLabel>Tipo de Fondo</FormLabel>
-                        <Input type="text" name="tipoFondo" value={editedRubrica.tipoFondo} onChange={handleChange} />
+                        <FormLabel>Categoría</FormLabel>
+                        <Select
+                            name="categorias"
+                            value={editedRubrica.categorias}
+                            onChange={(e) => handleCategoriaChange(e.target.value)}
+                            placeholder={editedRubrica.categorias ? editedRubrica.categorias.nombre : 'Seleccionar una Categoría'}
+                        >
+                            {categorias.map((categorias) => (
+                                <option key={categorias._id} value={categorias._id}>
+                                    {categorias.nombre}
+                                </option>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl mb={4}>
+                        <FormLabel>Postulación</FormLabel>
+                        <Select
+                            name="postulacion"
+                            value={editedRubrica.postulacion}
+                            onChange={(e) => handlePostulacionChange(e.target.value)}
+                            placeholder={editedRubrica.postulacion ? editedRubrica.categorias.postulacion : 'Seleccionar una Postulación'}
+                        >
+                            {postulaciones.map((postulacion) => (
+                                <option key={postulacion._id} value={postulacion._id}>
+                                    {postulacion.proyecto}
+                                </option>
+                            ))}
+                        </Select>
                     </FormControl>
                     <FormControl mb={4}>
                         <FormLabel>Puntaje Mínimo de Aprobación</FormLabel>
@@ -165,13 +216,13 @@ const RubricaEdit = ({ isOpen, onClose, rubrica }) => {
                             onChange={handleChange}
                         />
                     </FormControl>
-                    {editedRubrica.criterios.map((criterio, index) => (
+                    {(editedRubrica.criterios || []).map((criterio, index) => (
                         <Flex key={`flex_${criterio._id || index}`} mb={4} align="center">
                             <FormLabel>Criterio de Evaluación</FormLabel>
                             <Select
                                 value={selectedCriterios[index] ? selectedCriterios[index]._id : ''}
                                 onChange={(e) => handleSelectChange(e.target.value, index)}
-                                placeholder="Seleccionar un Criterio"
+                                placeholder={criterio.nombre || 'Seleccionar un Criterio'}
                             >
                                 {criterios.map((c) => (
                                     <option key={c._id} value={c._id}>

@@ -52,13 +52,11 @@ function Navbar() {
     { name: ' Crear Fondos', href: '/fondos/create', current: false },
     { name: 'Crear Concursos', href: '/concursos/create', current: false },
     { name: 'Postulaciones', href: '#', current: false },
-    { name: 'Rubricas', href: '#', current: false },
+    { name: 'Rubricas', href: '/rubrica', current: false },
   ];
 
   const navEvaluador = [
-    { name: 'Ejemplo evaluador 1', href: '', current: false },
-    { name: 'Ejemplo evaluador 2', href: '#', current: false },
-    { name: 'Ejemplo evaluador 3', href: '#', current: false },
+    { name: 'Evaluar Rubricas', href: '/evaluacion', current: false },
   ];
 
   return (

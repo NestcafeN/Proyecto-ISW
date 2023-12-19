@@ -1,8 +1,9 @@
 import { Card, CardBody, useToast, CardFooter, Stack, Text, Heading, Divider, Button, ButtonGroup, SimpleGrid} from '@chakra-ui/react'
 import { ViewIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
-import axios from '../services/root.service'
 import FondoDelete from './FondosDelete';
+import { deleteFondo } from '../services/fondo.service';
+import axios from '../services/root.service'
 
 
 function Fondosmain({ onEliminarClick}) {
@@ -36,11 +37,17 @@ function Fondosmain({ onEliminarClick}) {
       position: 'top'
     })
 }
+ 
 
-  
-
-const handleEliminarClick = () => {
-  setDeleteDialogOpen(true);
+const handleEliminarClick = async (fondoId) => {
+  const isConfirmed = await handleDeleteConfirm();
+  console.log(isConfirmed)
+  if (isConfirmed) {
+    const response = await deleteFondo(fondoId);
+    if (response.status === 200) {
+      await showDeleteForm();
+    }
+  }
 };
 
 const handleDeleteConfirm = () => {
@@ -72,7 +79,7 @@ const handleDeleteCancel = () => {
           <Divider />
           <CardFooter>
             <ButtonGroup spacing='2'>
-              <Button onClick={handleEliminarClick}>
+              <Button onClick={() => handleEliminarClick(fondo._id)}>
                 <DeleteIcon color="black" />Eliminar</Button>
             </ButtonGroup>
           </CardFooter>

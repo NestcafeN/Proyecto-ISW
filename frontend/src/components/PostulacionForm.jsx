@@ -1,75 +1,105 @@
-
 import React from 'react';
-import { useState } from 'react'
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, FormControl, FormLabel, Input, VStack } from '@chakra-ui/react';
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  VStack,
+  Text,
+  Box,
+} from '@chakra-ui/react';
 import { createPostulacion } from '../services/postulacionService';
 
 const PostulacionForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [postulacionEnviada, setPostulacionEnviada] = useState(false);
 
   const onSubmit = async (data) => {
     try {
-      // Lógica para enviar la postulación al backend utilizando postulacionService
+
       const response = await createPostulacion(data);
-      console.log(response); // Manejar la respuesta según tus necesidades
+      console.log(response); 
       setPostulacionEnviada(true);
       alert('Postulación enviada con éxito');
     } catch (error) {
       console.error('Error al enviar la postulación:', error.message);
-      // Manejar el error según tus necesidades
+
       alert('Error al enviar la postulación. Por favor, intenta de nuevo.');
     }
   };
 
   return (
-    <VStack as="form" onSubmit={handleSubmit(onSubmit)} spacing={4}>
-      <FormControl>
+    <VStack
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+      spacing={4}
+      align="start"
+      maxW="400px"
+      m="auto"
+    >
+      <FormControl isInvalid={errors.nombreCompleto}>
         <FormLabel>Nombre Completo</FormLabel>
         <Input {...register('nombreCompleto', { required: 'Campo requerido' })} />
-        {errors.nombreCompleto && <span>{errors.nombreCompleto.message}</span>}
+        <FormErrorMessage>{errors.nombreCompleto && errors.nombreCompleto.message}</FormErrorMessage>
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={errors.rut}>
         <FormLabel>RUT</FormLabel>
-        <Input {...register('rut', { required: 'Campo requerido' })} />
-        {errors.rut && <span>{errors.rut.message}</span>}
-      </FormControl>
+        <Input
+          {...register('rut', {
+            required: 'Campo requerido',
+          })}
 
-      <FormControl>
-        <FormLabel>Concurso</FormLabel>
-        <Input {...register('concurso', { required: 'Campo requerido' })} />
-        {errors.concurso && <span>{errors.concurso.message}</span>}
+        />
+        {errors.rut && (
+          <FormErrorMessage>
+            {errors.rut.message || 'Formato de RUT no válido'}
+          </FormErrorMessage>
+        )}
+        <Text fontSize="sm" color="gray.500" mt="1">
+          Coloque su RUT sin puntos ni guion.
+        </Text>
       </FormControl>
-
-      <FormControl>
-        <FormLabel>Correo Electrónico</FormLabel>
-        <Input {...register('correo', { required: 'Campo requerido' })} />
-        {errors.correo && <span>{errors.correo.message}</span>}
-      </FormControl>
-
-      <FormControl>
+      <FormControl isInvalid={errors.direccion}>
         <FormLabel>Dirección</FormLabel>
         <Input {...register('direccion', { required: 'Campo requerido' })} />
-        {errors.direccion && <span>{errors.direccion.message}</span>}
+        <FormErrorMessage>{errors.direccion && errors.direccion.message}</FormErrorMessage>
       </FormControl>
 
-      <FormControl>
+      <FormControl isInvalid={errors.concurso}>
+        <FormLabel>Concurso</FormLabel>
+        <Input {...register('concurso', { required: 'Campo requerido' })} />
+        <FormErrorMessage>{errors.concurso && errors.concurso.message}</FormErrorMessage>
+      </FormControl>
+
+      <FormControl isInvalid={errors.proyecto}>
         <FormLabel>Proyecto</FormLabel>
         <Input {...register('proyecto', { required: 'Campo requerido' })} />
-        {errors.proyecto && <span>{errors.proyecto.message}</span>}
+        <FormErrorMessage>{errors.proyecto && errors.proyecto.message}</FormErrorMessage>
       </FormControl>
 
-      <Button type="submit">Enviar Postulación</Button>
-    
-     {postulacionEnviada && (
-      <div>
-        <p>Postulación enviada con éxito.</p>
-        <Button onClick={() => setPostulacionEnviada(false)}>Cerrar</Button>
-      </div>
-    )}
-  </VStack>
+      <Button type="submit" colorScheme="teal">
+        Enviar Postulación
+      </Button>
+
+      {postulacionEnviada && (
+        <Box p="4" borderWidth="1px" borderRadius="md" borderColor="teal.300">
+          <Text color="teal.600" fontWeight="bold">
+            ¡Postulación enviada con éxito!
+          </Text>
+          <Button onClick={() => setPostulacionEnviada(false)} mt="2">
+            Cerrar
+          </Button>
+        </Box>
+      )}
+    </VStack>
   );
 };
 

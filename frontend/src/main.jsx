@@ -40,7 +40,15 @@ const router = createBrowserRouter([
       {
         path: 'categorias/create',
         element: <CategoriasCreatePage />,
-      }
+      },
+      {
+        path: '/postulacion/create',
+        element: <PostulacionCreatePage />,
+      },
+      {
+        path: '/todas-postulaciones',
+        element: <TodasPostulaciones />,
+      },
     ],
   },
   {

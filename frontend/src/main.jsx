@@ -46,18 +46,18 @@ const router = createBrowserRouter([
       {
         path: '/postulacion/create',
         element: <PostulacionCreatePage />,
-      }
+      },
+      {
+        path: '/todas-postulaciones',
+        element: <TodasPostulaciones />,
+      },
+    
     ],
   },
   {
     path: '/auth',
     element: <Login />,
   },
-  {
-    path: '/todas-postulaciones',
-    element: <TodasPostulaciones />,
-  },
-
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

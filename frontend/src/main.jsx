@@ -11,6 +11,7 @@ import Rubrica from './routes/Rubrica.jsx'
 import EvaluacionPage from './routes/EvaluacionPage';
 import CategoriasCreatePage from './routes/CategoriasCreatePage.jsx'
 import PostulacionCreatePage from './routes/PostulacionCreatePage.jsx'
+import TodasPostulaciones from './routes/PostulacionPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
   {
     path: '/auth',
     element: <Login />,
+  },
+  {
+    path: '/todas-postulaciones',
+    element: <TodasPostulaciones />,
   },
 
 ]);
